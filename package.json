@@ -1,0 +1,12 @@
+{
+  "name": "kikam-technical-institute",
+  "version": "1.0.0",
+  "description": "Official website for Kikam Technical Institute",
+  "scripts": {
+    "build": "tailwindcss -i ./public/assets/css/input.css -o ./public/assets/css/output.css --minify",
+    "watch": "tailwindcss -i ./public/assets/css/input.css -o ./public/assets/css/output.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  }
+}

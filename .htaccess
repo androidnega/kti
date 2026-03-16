@@ -1,0 +1,9 @@
+RewriteEngine On
+RewriteBase /KTI/
+
+# Don't redirect admin directory
+RewriteCond %{REQUEST_URI} !^/KTI/admin/
+# Don't redirect if already in public
+RewriteCond %{REQUEST_URI} !^/KTI/public/
+# Redirect everything else to public folder
+RewriteRule ^(.*)$ public/$1 [L]

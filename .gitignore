@@ -1,0 +1,7 @@
+node_modules/
+storage/database.sqlite
+storage/uploads/*
+!storage/uploads/.gitkeep
+public/assets/css/output.css
+.DS_Store
+*.log
