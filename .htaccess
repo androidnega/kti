@@ -1,11 +1,11 @@
 RewriteEngine On
-RewriteBase /KTI/
+RewriteBase /
 
-# Don't redirect admin directory
-RewriteCond %{REQUEST_URI} !^/KTI/admin/
-# Don't redirect dashboard directory
-RewriteCond %{REQUEST_URI} !^/KTI/dashboard/
+# Don't redirect admin or dashboard directories
+RewriteCond %{REQUEST_URI} !^/admin/
+RewriteCond %{REQUEST_URI} !^/dashboard/
 # Don't redirect if already in public
-RewriteCond %{REQUEST_URI} !^/KTI/public/
+RewriteCond %{REQUEST_URI} !^/public/
+
 # Redirect everything else to public folder
 RewriteRule ^(.*)$ public/$1 [L]

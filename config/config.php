@@ -2,8 +2,8 @@
 
 // Application Configuration
 define('APP_NAME', 'Kikam Technical Institute');
-define('APP_URL', 'http://localhost/KTI/public');
-define('ADMIN_URL', 'http://localhost/KTI/admin');
+define('APP_URL', 'https://kikamtech.org');
+define('ADMIN_URL', 'https://kikamtech.org/admin');
 
 // Database Configuration
 define('DB_PATH', __DIR__ . '/../storage/database.sqlite');
