@@ -46,9 +46,9 @@ CREATE TABLE IF NOT EXISTS programs (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insert default admin user (password: admin123)
+-- Insert default admin user (username: admin, password: admin123)
 INSERT INTO users (name, email, password_hash, role) 
-VALUES ('Administrator', 'admin@kti.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+VALUES ('admin', 'admin', '$2y$12$nPafwFSxEX.vEtQ2O70Sj.25gWchaC/1aeWV//uyGofzNyxjhfNzC', 'admin');
 
 -- Insert homepage with real information
 INSERT INTO pages (slug, title, content) 

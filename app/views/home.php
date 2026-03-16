@@ -1,14 +1,15 @@
 <?php ob_start(); ?>
 
 <!-- Hero Section -->
-<section class="hero relative py-32 bg-cover bg-center" style="background-image: url('<?= APP_URL ?>/assets/images/droneshotcampus.jpg');">
-    <div class="absolute inset-0 bg-black bg-opacity-70"></div>
+<section class="hero relative py-20 sm:py-24 md:py-32 bg-cover bg-center" style="background-image: url('<?= APP_URL ?>/assets/images/droneshotcampus.jpg');">
+    <div class="absolute inset-0 bg-gradient-to-br from-primary-900/95 via-primary-900/85 to-primary-900/80"></div>
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-        <h1 class="text-5xl md:text-6xl font-bold mb-6 text-balance">
-            Welcome to Kikam Technical Institute
+        <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-3 sm:mb-4 leading-tight tracking-tight text-balance" style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+            <span class="text-white">Welcome to Kikam Technical Institute</span>
         </h1>
-        <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-            Providing demand-driven technical education since 1963 - Judge Us By Our Deeds
+        <p class="font-sans text-xl sm:text-2xl md:text-3xl font-semibold text-accent-400 mb-8 sm:mb-10 text-balance">
+            <span class="text-white">We are</span>
+            <span class="ml-3 border-r-2 border-accent-400 pr-1 min-w-[7ch]" id="typewriter-dynamic"></span>
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <a href="<?= APP_URL ?>?url=programs" class="btn bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-md text-lg transition-colors border-2 border-primary-600">
@@ -18,6 +19,73 @@
                 Contact Us
             </a>
         </div>
+        <script>
+            (function () {
+                const phrases = [
+                    'Supreme Kimtech',
+                    'TVET Excellence',
+                    'Skills for Life',
+                    'Career Ready'
+                ];
+
+                const el = document.getElementById('typewriter-dynamic');
+                if (!el) return;
+
+                let phraseIndex = 0;
+                let charIndex = 0;
+                let deleting = false;
+
+                function randomDelay(base, variance) {
+                    return base + Math.floor(Math.random() * variance);
+                }
+
+                function nextPhrase() {
+                    phraseIndex = (phraseIndex + 1) % phrases.length;
+                }
+
+                function tick() {
+                    const current = phrases[phraseIndex];
+
+                    // Randomly choose a typing style each full cycle
+                    const style = phraseIndex % 3; // 0: normal, 1: fast, 2: slower
+
+                    const typingBase = style === 0 ? 90 : style === 1 ? 55 : 120;
+                    const typingVar = style === 0 ? 60 : style === 1 ? 30 : 40;
+                    const deletingBase = style === 0 ? 60 : style === 1 ? 45 : 80;
+                    const deletingVar = style === 0 ? 40 : style === 1 ? 25 : 35;
+
+                    if (!deleting) {
+                        charIndex++;
+                        el.textContent = current.slice(0, charIndex);
+
+                        if (charIndex === current.length) {
+                            // Hold full text briefly, then maybe do a quick blink before deleting
+                            const holdTime = style === 1 ? 800 : 1200;
+                            setTimeout(() => {
+                                deleting = true;
+                                tick();
+                            }, holdTime);
+                            return;
+                        }
+                    } else {
+                        charIndex--;
+                        el.textContent = current.slice(0, charIndex);
+
+                        if (charIndex === 0) {
+                            deleting = false;
+                            nextPhrase();
+                        }
+                    }
+
+                    const base = deleting ? deletingBase : typingBase;
+                    const variance = deleting ? deletingVar : typingVar;
+                    setTimeout(tick, randomDelay(base, variance));
+                }
+
+                // Start with a small delay so page loads cleanly
+                setTimeout(tick, 600);
+            })();
+        </script>
     </div>
 </section>
 

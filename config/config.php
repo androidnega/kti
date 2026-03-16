@@ -19,7 +19,7 @@ define('UPLOAD_PATH', STORAGE_PATH . '/uploads');
 define('SESSION_LIFETIME', 3600); // 1 hour
 
 // Environment
-define('ENVIRONMENT', 'development'); // development or production
+define('ENVIRONMENT', 'production'); // development or production
 
 // Error Reporting
 if (ENVIRONMENT === 'development') {

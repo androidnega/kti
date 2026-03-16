@@ -93,6 +93,9 @@
           .nav-link {
             @apply text-gray-700 hover:text-primary-600 font-medium transition-colors duration-200;
           }
+          .nav-link-active {
+            @apply text-primary-700 border-b-2 border-accent-400;
+          }
         }
         @layer utilities {
           .glass {
@@ -108,26 +111,50 @@
     <!-- Navigation -->
     <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
+            <div class="flex justify-between items-center h-16 sm:h-20">
+                <!-- Brand -->
                 <div class="flex items-center">
                     <a href="<?= APP_URL ?>" class="flex-shrink-0 flex items-center gap-3">
-                        <img src="<?= APP_URL ?>/assets/images/logo.png" alt="Kikam Technical Institute" class="h-12 w-auto object-contain">
+                        <img src="<?= APP_URL ?>/assets/images/logo.png" alt="Kikam Technical Institute" class="h-10 sm:h-12 w-auto object-contain">
                         <div class="flex flex-col">
-                            <span class="text-xl md:text-2xl font-bold text-primary-800 leading-none tracking-tight">KTI</span>
-                            <span class="text-[0.65rem] font-bold text-accent-600 tracking-widest uppercase">Supreme Kimtech</span>
+                            <span class="text-lg sm:text-xl md:text-2xl font-bold text-primary-800 leading-none tracking-tight">KTI</span>
+                            <span class="text-[0.6rem] sm:text-[0.65rem] font-bold text-accent-600 tracking-widest uppercase">Supreme Kimtech</span>
                         </div>
                     </a>
                 </div>
-                <div class="hidden md:flex space-x-8">
-                    <a href="<?= APP_URL ?>" class="nav-link">Home</a>
-                    <a href="<?= APP_URL ?>?url=history" class="nav-link">History</a>
-                    <a href="<?= APP_URL ?>?url=programs" class="nav-link">Programs</a>
-                    <a href="<?= APP_URL ?>?url=staff" class="nav-link">Staff</a>
-                    <a href="<?= APP_URL ?>?url=contact" class="nav-link">Contact</a>
+
+                <!-- Desktop nav -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="<?= APP_URL ?>" class="nav-link <?= empty($_GET['url']) || $_GET['url'] === 'home' ? 'nav-link-active' : '' ?>">Home</a>
+                    <a href="<?= APP_URL ?>?url=history" class="nav-link <?= ($_GET['url'] ?? '') === 'history' ? 'nav-link-active' : '' ?>">History</a>
+                    <a href="<?= APP_URL ?>?url=programs" class="nav-link <?= ($_GET['url'] ?? '') === 'programs' ? 'nav-link-active' : '' ?>">Programs</a>
+                    <a href="<?= APP_URL ?>?url=staff" class="nav-link <?= ($_GET['url'] ?? '') === 'staff' ? 'nav-link-active' : '' ?>">Staff</a>
+                    <a href="<?= APP_URL ?>?url=contact" class="nav-link <?= ($_GET['url'] ?? '') === 'contact' ? 'nav-link-active' : '' ?>">Contact</a>
                 </div>
-                <div>
-                    <a href="<?= ADMIN_URL ?>" class="btn btn-primary text-sm bg-primary-800 hover:bg-primary-900">Admin Login</a>
+
+                <!-- Mobile hamburger -->
+                <div class="flex md:hidden">
+                    <button type="button" class="inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:text-primary-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-primary-500" aria-controls="mobile-menu" aria-expanded="false" id="mobile-menu-button">
+                        <span class="sr-only">Open main menu</span>
+                        <svg id="icon-menu-open" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg id="icon-menu-close" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Mobile menu panel -->
+        <div class="md:hidden border-t border-gray-100 bg-white/95 backdrop-blur-sm" id="mobile-menu" style="display: none;">
+            <div class="px-4 pt-3 pb-4 space-y-1">
+                <a href="<?= APP_URL ?>" class="block px-3 py-2 rounded-lg text-base font-medium <?= empty($_GET['url']) || $_GET['url'] === 'home' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Home</a>
+                <a href="<?= APP_URL ?>?url=history" class="block px-3 py-2 rounded-lg text-base font-medium <?= ($_GET['url'] ?? '') === 'history' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">History</a>
+                <a href="<?= APP_URL ?>?url=programs" class="block px-3 py-2 rounded-lg text-base font-medium <?= ($_GET['url'] ?? '') === 'programs' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Programs</a>
+                <a href="<?= APP_URL ?>?url=staff" class="block px-3 py-2 rounded-lg text-base font-medium <?= ($_GET['url'] ?? '') === 'staff' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Staff</a>
+                <a href="<?= APP_URL ?>?url=contact" class="block px-3 py-2 rounded-lg text-base font-medium <?= ($_GET['url'] ?? '') === 'contact' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Contact</a>
             </div>
         </div>
     </nav>
@@ -194,5 +221,23 @@
             </div>
         </div>
     </footer>
+<script>
+    (function () {
+        const btn = document.getElementById('mobile-menu-button');
+        const menu = document.getElementById('mobile-menu');
+        const iconOpen = document.getElementById('icon-menu-open');
+        const iconClose = document.getElementById('icon-menu-close');
+
+        if (!btn || !menu || !iconOpen || !iconClose) return;
+
+        btn.addEventListener('click', function () {
+            const isHidden = menu.style.display === 'none' || menu.style.display === '';
+            menu.style.display = isHidden ? 'block' : 'none';
+            iconOpen.classList.toggle('hidden', !isHidden);
+            iconClose.classList.toggle('hidden', isHidden);
+            btn.setAttribute('aria-expanded', String(isHidden));
+        });
+    })();
+</script>
 </body>
 </html>
