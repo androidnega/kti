@@ -110,7 +110,7 @@
             </div>
             <div class="relative">
                 <div class="absolute inset-0 bg-primary-600 rounded-2xl transform rotate-3 scale-105 opacity-10"></div>
-                <img src="<?= APP_URL ?>/assets/images/students-auto.jpg" alt="Students in workshop" class="relative rounded-2xl shadow-xl w-full h-[400px] object-cover">
+                <img src="<?= APP_URL ?>/assets/images/kikamcampus.jpg" alt="Kikam Technical Institute campus" class="relative rounded-2xl shadow-xl w-full h-[400px] object-cover object-center">
             </div>
         </div>
     </div>

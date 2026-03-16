@@ -22,7 +22,7 @@ define('SESSION_LIFETIME', 3600); // 1 hour
 define('ENVIRONMENT', 'production'); // development or production
 
 // Error Reporting
-if (ENVIRONMENT === 'development') {
+if (ENVIRONMENT === 'production') {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
 } else {
