@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS programs (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Insert default admin user (username: admin, password: admin123)
+-- Insert initial admin user (credentials should be changed in production)
 INSERT INTO users (name, email, password_hash, role) 
 VALUES ('admin', 'admin', '$2y$12$nPafwFSxEX.vEtQ2O70Sj.25gWchaC/1aeWV//uyGofzNyxjhfNzC', 'admin');
 

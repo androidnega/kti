@@ -10,20 +10,6 @@ class Auth {
             [$username]
         );
 
-        // If no user exists yet and default admin credentials are used,
-        // create the seeded admin account on the fly.
-        if (!$user && $username === 'admin' && $password === 'admin123') {
-            $hash = self::hashPassword($password);
-            $db->query(
-                "INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)",
-                ['admin', 'admin', $hash, 'admin']
-            );
-            $user = $db->fetchOne(
-                "SELECT * FROM users WHERE name = ?",
-                ['admin']
-            );
-        }
-
         if ($user && password_verify($password, $user['password_hash'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
