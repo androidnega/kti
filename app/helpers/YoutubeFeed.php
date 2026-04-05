@@ -10,6 +10,48 @@ class YoutubeFeed {
     private const RSS_NS_MEDIA = 'http://search.yahoo.com/mrss/';
 
     /**
+     * Build video rows from YOUTUBE_CURATED_VIDEO_IDS using YouTube oEmbed (no API key).
+     *
+     * @return array<int, array{video_id:string,title:string,published:string,thumbnail:string,url:string}>
+     */
+    public static function buildCuratedVideos() {
+        if (!defined('YOUTUBE_CURATED_VIDEO_IDS') || !is_array(YOUTUBE_CURATED_VIDEO_IDS)) {
+            return [];
+        }
+        $out = [];
+        foreach (YOUTUBE_CURATED_VIDEO_IDS as $rawId) {
+            $videoId = preg_replace('/[^a-zA-Z0-9_-]/', '', (string) $rawId);
+            if ($videoId === '') {
+                continue;
+            }
+            $watchUrl = 'https://www.youtube.com/watch?v=' . rawurlencode($videoId);
+            $oembedUrl = 'https://www.youtube.com/oembed?format=json&url=' . rawurlencode($watchUrl);
+            $json = self::httpGet($oembedUrl);
+            $title = 'KTI on YouTube';
+            $thumb = 'https://i.ytimg.com/vi/' . $videoId . '/hqdefault.jpg';
+            if ($json !== null) {
+                $data = json_decode($json, true);
+                if (is_array($data)) {
+                    if (!empty($data['title']) && is_string($data['title'])) {
+                        $title = $data['title'];
+                    }
+                    if (!empty($data['thumbnail_url']) && is_string($data['thumbnail_url'])) {
+                        $thumb = $data['thumbnail_url'];
+                    }
+                }
+            }
+            $out[] = [
+                'video_id' => $videoId,
+                'title' => $title,
+                'published' => '',
+                'thumbnail' => $thumb,
+                'url' => $watchUrl,
+            ];
+        }
+        return $out;
+    }
+
+    /**
      * @return array{0: array<int, array{video_id:string,title:string,published:string,thumbnail:string,url:string}>, 1: ?string} [videos, error message]
      */
     public static function fetchChannelVideos() {

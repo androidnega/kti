@@ -58,10 +58,21 @@ class HomeController extends BaseController {
     }
 
     public function videos() {
+        $curated = YoutubeFeed::buildCuratedVideos();
+        if (count($curated) > 0) {
+            $this->view('videos', [
+                'videos' => $curated,
+                'feedError' => null,
+                'videoSource' => 'curated',
+            ]);
+            return;
+        }
+
         list($videos, $feedError) = YoutubeFeed::fetchChannelVideos();
         $this->view('videos', [
             'videos' => $videos,
             'feedError' => $feedError,
+            'videoSource' => 'feed',
         ]);
     }
 

@@ -10,6 +10,16 @@ define('YOUTUBE_CHANNEL_ID', 'UCA4fazj3TsAZelogMi8MS7w');
 define('YOUTUBE_CHANNEL_URL', 'https://www.youtube.com/@KikamTechnicalInstitute');
 define('YOUTUBE_API_KEY', ''); // optional: paste key from Google Cloud Console to load all uploads
 
+// Curated watch?v= IDs for the Videos page (shown when non-empty; titles load via oEmbed). Leave empty to use RSS/API only.
+define('YOUTUBE_CURATED_VIDEO_IDS', [
+    'hEGC-NGcZYU',
+    's8UmDYb6hvU',
+    'H-RnUAn6b7Q',
+    'GVkQrtr5fQM',
+    '5cxyVBU4R0E',
+    'xenGD-Vxf10',
+]);
+
 // Database Configuration
 define('DB_PATH', __DIR__ . '/../storage/database.sqlite');
 

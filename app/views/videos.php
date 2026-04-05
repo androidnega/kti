@@ -29,20 +29,45 @@
         <?php elseif (empty($videos)): ?>
             <p class="text-center text-gray-600 text-lg">No videos are listed yet. Check back soon or visit our channel on YouTube.</p>
         <?php else: ?>
-            <?php if (defined('YOUTUBE_API_KEY') && YOUTUBE_API_KEY !== ''): ?>
-                <p class="text-center text-sm text-gray-600 mb-10 max-w-2xl mx-auto">
-                    Showing uploads from our channel (loaded via YouTube Data API).
-                </p>
-            <?php else: ?>
-                <p class="text-center text-sm text-gray-600 mb-10 max-w-2xl mx-auto">
-                    Showing the latest videos from our channel feed.
-                    <a href="<?= htmlspecialchars(YOUTUBE_CHANNEL_URL) ?>/videos" class="text-primary-900 font-semibold hover:underline" target="_blank" rel="noopener noreferrer">See the full archive on YouTube</a>.
-                </p>
-            <?php endif; ?>
+            <?php
+            $source = $videoSource ?? 'feed';
+            ?>
+            <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10">
+                <div class="max-w-xl">
+                    <?php if ($source === 'curated'): ?>
+                        <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
+                            Featured clips from our channel. Use the search box to find a video by title. For the full library, visit
+                            <a href="<?= htmlspecialchars(YOUTUBE_CHANNEL_URL) ?>/videos" class="text-primary-900 font-semibold hover:underline" target="_blank" rel="noopener noreferrer">YouTube</a>.
+                        </p>
+                    <?php elseif (defined('YOUTUBE_API_KEY') && YOUTUBE_API_KEY !== ''): ?>
+                        <p class="text-gray-600 text-sm sm:text-base">Uploads from our channel (YouTube Data API). Search filters the list below.</p>
+                    <?php else: ?>
+                        <p class="text-gray-600 text-sm sm:text-base">
+                            Latest videos from our channel feed.
+                            <a href="<?= htmlspecialchars(YOUTUBE_CHANNEL_URL) ?>/videos" class="text-primary-900 font-semibold hover:underline" target="_blank" rel="noopener noreferrer">Full archive on YouTube</a>.
+                        </p>
+                    <?php endif; ?>
+                </div>
+                <div class="w-full lg:max-w-md shrink-0">
+                    <label for="videoSearch" class="block text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Search videos</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </span>
+                        <input type="search" id="videoSearch" autocomplete="off" placeholder="Type to filter by title…" class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 shadow-sm focus:ring-2 focus:ring-accent-400 focus:border-accent-400 outline-none transition-shadow">
+                    </div>
+                    <p class="mt-2 text-sm text-gray-500" id="videoSearchCount" aria-live="polite"></p>
+                </div>
+            </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <p class="hidden rounded-xl border border-gray-200 bg-white px-6 py-12 text-center text-gray-600 mb-8" id="videoNoResults" role="status">No videos match your search. Try another word or clear the box.</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="videoGrid">
                 <?php foreach ($videos as $v): ?>
-                    <article class="group bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <?php
+                    $searchBlob = strtolower($v['title'] . ' ' . $v['video_id']);
+                    ?>
+                    <article class="video-card group bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow" data-video-search="<?= htmlspecialchars($searchBlob, ENT_QUOTES, 'UTF-8') ?>">
                         <a href="<?= htmlspecialchars($v['url']) ?>" target="_blank" rel="noopener noreferrer" class="block relative aspect-video bg-black">
                             <img src="<?= htmlspecialchars($v['thumbnail']) ?>" alt="" class="w-full h-full object-cover opacity-95 group-hover:opacity-100 transition-opacity" loading="lazy" width="480" height="360">
                             <span class="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
@@ -66,6 +91,41 @@
                     </article>
                 <?php endforeach; ?>
             </div>
+            <script>
+            (function () {
+                var input = document.getElementById('videoSearch');
+                var cards = document.querySelectorAll('.video-card');
+                var countEl = document.getElementById('videoSearchCount');
+                var emptyEl = document.getElementById('videoNoResults');
+                var grid = document.getElementById('videoGrid');
+                function norm(s) { return (s || '').toLowerCase().trim(); }
+                function update() {
+                    var q = norm(input && input.value);
+                    var n = 0;
+                    for (var i = 0; i < cards.length; i++) {
+                        var hay = cards[i].getAttribute('data-video-search') || '';
+                        var show = !q || hay.indexOf(q) !== -1;
+                        cards[i].classList.toggle('hidden', !show);
+                        if (show) n++;
+                    }
+                    if (countEl) {
+                        countEl.textContent = n === cards.length
+                            ? String(cards.length) + ' video' + (cards.length === 1 ? '' : 's')
+                            : String(n) + ' of ' + String(cards.length) + ' videos';
+                    }
+                    if (emptyEl && grid) {
+                        var none = n === 0 && cards.length > 0;
+                        emptyEl.classList.toggle('hidden', !none);
+                        grid.classList.toggle('hidden', none);
+                    }
+                }
+                if (input) {
+                    input.addEventListener('input', update);
+                    input.addEventListener('search', update);
+                    update();
+                }
+            })();
+            </script>
         <?php endif; ?>
     </div>
 </section>
