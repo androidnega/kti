@@ -108,9 +108,18 @@
                     </svg>
                 </a>
             </div>
-            <div class="relative">
-                <div class="absolute inset-0 bg-primary-600 rounded-2xl transform rotate-3 scale-105 opacity-10"></div>
-                <img src="<?= APP_URL ?>/assets/images/kikamcampus.jpg" alt="Kikam Technical Institute campus" class="relative rounded-2xl shadow-xl w-full h-[400px] object-cover object-center">
+            <div class="relative w-full">
+                <div class="absolute inset-0 bg-primary-600 rounded-2xl transform rotate-3 scale-105 opacity-10 pointer-events-none hidden md:block"></div>
+                <div class="relative rounded-2xl shadow-xl overflow-hidden aspect-video bg-black">
+                    <iframe
+                        src="https://www.youtube.com/embed/bZpjM5tDBcA?controls=0&amp;modestbranding=1&amp;rel=0"
+                        title="Kikam Technical Institute"
+                        class="absolute inset-0 w-full h-full border-0"
+                        loading="lazy"
+                        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen
+                    ></iframe>
+                </div>
             </div>
         </div>
     </div>
