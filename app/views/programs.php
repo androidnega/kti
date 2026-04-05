@@ -49,14 +49,6 @@
                             <p class="text-gray-600 leading-relaxed flex-grow">
                                 <?= htmlspecialchars($program['description']) ?>
                             </p>
-                            <div class="mt-6 pt-4 border-t border-gray-100">
-                                <a href="<?= APP_URL ?>?url=contact" class="text-primary-600 font-medium hover:text-primary-800 inline-flex items-center group">
-                                    Apply Now
-                                    <svg class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </a>
-                            </div>
                         </div>
                     <?php endforeach; ?>
                 <?php endforeach; ?>
