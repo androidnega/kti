@@ -121,8 +121,8 @@
         <img src="<?= APP_URL ?>/assets/images/school-building.jpg" alt="" class="w-full h-full object-cover">
     </div>
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        <h2 class="text-4xl font-bold mb-4">Ready to Apply?</h2>
-        <p class="text-xl text-primary-100 mb-8">Join us and start your journey towards a successful technical career</p>
+        <h2 class="text-4xl font-bold mb-4">Questions about our programs?</h2>
+        <p class="text-xl text-primary-100 mb-8">Contact us to learn more about training at KTI and what we offer.</p>
         <a href="<?= APP_URL ?>?url=contact" class="btn bg-accent-400 text-primary-900 hover:bg-accent-500 px-8 py-3 text-lg font-bold">
             Contact Us Today
         </a>

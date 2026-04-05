@@ -212,10 +212,10 @@
         <img src="<?= APP_URL ?>/assets/images/entrance.jpg" alt="" class="w-full h-full object-cover">
     </div>
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        <h2 class="text-4xl font-bold mb-4">Ready to Start Your Journey?</h2>
-        <p class="text-xl text-primary-100 mb-8">Join thousands of students who have transformed their careers with KTI</p>
+        <h2 class="text-4xl font-bold mb-4">Want to know more?</h2>
+        <p class="text-xl text-primary-100 mb-8">Reach out for information about our campus, programs, and institute.</p>
         <a href="<?= APP_URL ?>?url=contact" class="btn bg-accent-400 text-primary-900 hover:bg-accent-500 px-8 py-3 text-lg font-bold">
-            Get Started Today
+            Contact Us
         </a>
     </div>
 </section>
