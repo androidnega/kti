@@ -7,7 +7,7 @@
         <p class="mt-1 text-sm text-gray-500">Manage teaching and non-teaching staff profiles.</p>
     </div>
     <div class="flex items-center gap-3">
-        <a href="<?= ADMIN_URL ?>?action=staff_create" class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-700 transition">
+        <a href="<?= ADMIN_URL ?>?action=staff_create" class="inline-flex items-center gap-2 rounded-lg bg-primary-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-black transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
             </svg>

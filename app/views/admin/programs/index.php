@@ -7,7 +7,7 @@
         <p class="mt-1 text-sm text-gray-500">Configure and maintain all academic and technical programs.</p>
     </div>
     <div class="flex items-center gap-3">
-        <a href="<?= ADMIN_URL ?>?action=program_create" class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700">
+        <a href="<?= ADMIN_URL ?>?action=program_create" class="inline-flex items-center gap-2 rounded-lg bg-primary-900 px-4 py-2 text-sm font-medium text-white hover:bg-black">
             <i class="fa-solid fa-plus text-xs"></i>
             Add Program
         </a>

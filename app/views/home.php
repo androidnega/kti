@@ -12,7 +12,7 @@
             <span class="ml-3 border-r-2 border-accent-400 pr-1 min-w-[7ch]" id="typewriter-dynamic"></span>
         </p>
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="<?= APP_URL ?>?url=programs" class="btn bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-md text-lg transition-colors border-2 border-primary-600">
+            <a href="<?= APP_URL ?>?url=programs" class="btn bg-primary-900 hover:bg-black text-white px-8 py-3 rounded-md text-lg transition-colors border-2 border-primary-900">
                 Explore Programs
             </a>
             <a href="<?= APP_URL ?>?url=contact" class="btn bg-white hover:bg-gray-100 text-primary-900 px-8 py-3 rounded-md text-lg transition-colors border-2 border-white">

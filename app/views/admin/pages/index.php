@@ -7,7 +7,7 @@
         <p class="mt-1 text-sm text-gray-500">Manage all static pages displayed on the public website.</p>
     </div>
     <div class="flex items-center gap-3">
-        <a href="<?= ADMIN_URL ?>?action=page_create" class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700">
+        <a href="<?= ADMIN_URL ?>?action=page_create" class="inline-flex items-center gap-2 rounded-lg bg-primary-900 px-4 py-2 text-sm font-medium text-white hover:bg-black">
             <i class="fa-solid fa-plus text-xs"></i>
             New Page
         </a>
@@ -52,8 +52,8 @@
                                 <div class="flex flex-col">
                                     <span class="font-medium text-gray-900"><?= htmlspecialchars($page['title']) ?></span>
                                     <?php if (in_array($page['slug'], ['home', 'about', 'contact'])): ?>
-                                        <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700 mt-1">
-                                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                        <span class="inline-flex items-center gap-1 rounded-full bg-accent-100 px-2 py-0.5 text-[10px] font-semibold text-accent-800 mt-1">
+                                            <span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>
                                             Core page
                                         </span>
                                     <?php endif; ?>

@@ -7,7 +7,7 @@
         <p class="mt-1 text-sm text-gray-500">Welcome back, <span class="font-semibold text-gray-800"><?= Auth::user()['name'] ?></span>. Here’s what’s happening in your system.</p>
     </div>
     <div class="flex items-center gap-3">
-        <a href="<?= ADMIN_URL ?>?action=page_create" class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700">
+        <a href="<?= ADMIN_URL ?>?action=page_create" class="inline-flex items-center gap-2 rounded-lg bg-primary-900 px-4 py-2 text-sm font-medium text-white hover:bg-black">
             <i class="fa-solid fa-plus text-xs"></i>
             New Page
         </a>
@@ -19,40 +19,40 @@
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="card bg-primary-600 text-white border-none">
+    <div class="card bg-primary-900 text-white border-none">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-primary-100 text-xs font-medium uppercase tracking-wide">Total Pages</p>
+                <p class="text-primary-200 text-xs font-medium uppercase tracking-wide">Total Pages</p>
                 <p class="text-4xl font-bold mt-3 leading-none"><?= $stats['pages'] ?></p>
-                <p class="mt-2 text-xs text-primary-100">Manage static and dynamic content</p>
+                <p class="mt-2 text-xs text-primary-300">Manage static and dynamic content</p>
             </div>
-            <div class="w-10 h-10 rounded bg-primary-700/60 flex items-center justify-center">
+            <div class="w-10 h-10 rounded bg-accent-400 text-primary-900 flex items-center justify-center">
                 <i class="fa-solid fa-file-lines text-lg"></i>
             </div>
         </div>
     </div>
 
-    <div class="card bg-emerald-500 text-white border-none">
+    <div class="card bg-accent-400 text-primary-900 border-none">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-emerald-100 text-xs font-medium uppercase tracking-wide">Staff Members</p>
+                <p class="text-primary-800 text-xs font-medium uppercase tracking-wide">Staff Members</p>
                 <p class="text-4xl font-bold mt-3 leading-none"><?= $stats['staff'] ?></p>
-                <p class="mt-2 text-xs text-emerald-100">Academic and non-teaching staff</p>
+                <p class="mt-2 text-xs text-primary-800/80">Academic and non-teaching staff</p>
             </div>
-            <div class="w-10 h-10 rounded bg-emerald-600/70 flex items-center justify-center">
+            <div class="w-10 h-10 rounded bg-primary-900 text-accent-400 flex items-center justify-center">
                 <i class="fa-solid fa-users text-lg"></i>
             </div>
         </div>
     </div>
 
-    <div class="card bg-indigo-500 text-white border-none">
+    <div class="card bg-primary-800 text-white border-none">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-indigo-100 text-xs font-medium uppercase tracking-wide">Programs</p>
+                <p class="text-primary-200 text-xs font-medium uppercase tracking-wide">Programs</p>
                 <p class="text-4xl font-bold mt-3 leading-none"><?= $stats['programs'] ?></p>
-                <p class="mt-2 text-xs text-indigo-100">Active technical and vocational programs</p>
+                <p class="mt-2 text-xs text-primary-300">Active technical and vocational programs</p>
             </div>
-            <div class="w-10 h-10 rounded bg-indigo-600/70 flex items-center justify-center">
+            <div class="w-10 h-10 rounded bg-accent-400 text-primary-900 flex items-center justify-center">
                 <i class="fa-solid fa-chalkboard-user text-lg"></i>
             </div>
         </div>
@@ -86,9 +86,9 @@
                 </span>
             </a>
 
-            <a href="<?= ADMIN_URL ?>?action=staff_create" class="group rounded-xl border border-gray-200 bg-white p-4 hover:border-emerald-200 hover:shadow-sm transition flex flex-col justify-between">
+            <a href="<?= ADMIN_URL ?>?action=staff_create" class="group rounded-xl border border-gray-200 bg-white p-4 hover:border-accent-300 hover:shadow-sm transition flex flex-col justify-between">
                 <div>
-                    <div class="inline-flex items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 w-9 h-9 mb-3">
+                    <div class="inline-flex items-center justify-center rounded-lg bg-accent-100 text-accent-800 w-9 h-9 mb-3">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
@@ -96,7 +96,7 @@
                     <h3 class="text-sm font-semibold text-gray-900">Add Staff Member</h3>
                     <p class="mt-1 text-xs text-gray-500">Maintain an up-to-date staff directory.</p>
                 </div>
-                <span class="mt-3 text-xs font-medium text-emerald-600 group-hover:text-emerald-700 inline-flex items-center">
+                <span class="mt-3 text-xs font-medium text-accent-700 group-hover:text-accent-800 inline-flex items-center">
                     Manage staff
                     <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -104,9 +104,9 @@
                 </span>
             </a>
 
-            <a href="<?= ADMIN_URL ?>?action=program_create" class="group rounded-xl border border-gray-200 bg-white p-4 hover:border-indigo-200 hover:shadow-sm transition flex flex-col justify-between">
+            <a href="<?= ADMIN_URL ?>?action=program_create" class="group rounded-xl border border-gray-200 bg-white p-4 hover:border-primary-300 hover:shadow-sm transition flex flex-col justify-between">
                 <div>
-                    <div class="inline-flex items-center justify-center rounded-lg bg-indigo-50 text-indigo-700 w-9 h-9 mb-3">
+                    <div class="inline-flex items-center justify-center rounded-lg bg-primary-100 text-primary-800 w-9 h-9 mb-3">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
@@ -114,7 +114,7 @@
                     <h3 class="text-sm font-semibold text-gray-900">Add Program</h3>
                     <p class="mt-1 text-xs text-gray-500">Update academic and technical offerings.</p>
                 </div>
-                <span class="mt-3 text-xs font-medium text-indigo-600 group-hover:text-indigo-700 inline-flex items-center">
+                <span class="mt-3 text-xs font-medium text-primary-700 group-hover:text-primary-900 inline-flex items-center">
                     Configure programs
                     <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -140,8 +140,8 @@
             </div>
             <div class="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2.5">
                 <dt class="text-xs font-medium text-gray-500">Environment</dt>
-                <dd class="inline-flex items-center gap-1 text-xs font-semibold <?= ENVIRONMENT === 'production' ? 'text-emerald-700' : 'text-amber-700' ?>">
-                    <span class="inline-block h-2 w-2 rounded-full <?= ENVIRONMENT === 'production' ? 'bg-emerald-500' : 'bg-amber-400' ?>"></span>
+                <dd class="inline-flex items-center gap-1 text-xs font-semibold <?= ENVIRONMENT === 'production' ? 'text-accent-800' : 'text-amber-700' ?>">
+                    <span class="inline-block h-2 w-2 rounded-full <?= ENVIRONMENT === 'production' ? 'bg-accent-500' : 'bg-amber-400' ?>"></span>
                     <?= ucfirst(ENVIRONMENT) ?>
                 </dd>
             </div>

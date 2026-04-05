@@ -38,16 +38,28 @@ if (Auth::check()) {
                 extend: {
                     colors: {
                         primary: {
-                            50: '#e6ebf5',
-                            100: '#ccd8eb',
-                            200: '#99b3d6',
-                            300: '#668ec2',
-                            400: '#3369ad',
-                            500: '#004499',
-                            600: '#00367a',
-                            700: '#002366', // School Navy
-                            800: '#001a4d',
-                            900: '#001133',
+                            50: '#fafafa',
+                            100: '#f4f4f5',
+                            200: '#e4e4e7',
+                            300: '#d4d4d8',
+                            400: '#a1a1aa',
+                            500: '#71717a',
+                            600: '#3f3f46',
+                            700: '#27272a',
+                            800: '#18181b',
+                            900: '#09090b',
+                        },
+                        accent: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
                         },
                         secondary: {
                             50: '#f8fafc',
@@ -69,7 +81,7 @@ if (Auth::check()) {
     <style type="text/tailwindcss">
         @layer components {
             .btn { @apply px-4 py-2 rounded-lg font-medium transition-all duration-200; }
-            .btn-primary { @apply bg-primary-600 text-white hover:bg-primary-700 shadow-sm hover:shadow-md; }
+            .btn-primary { @apply bg-primary-900 text-white hover:bg-black shadow-sm hover:shadow-md; }
             .card { @apply bg-white rounded-xl shadow-sm border border-gray-200; }
             .input { @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all text-sm; }
             .label { @apply block text-xs font-medium text-gray-700 mb-1; }

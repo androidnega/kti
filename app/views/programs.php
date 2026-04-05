@@ -19,11 +19,11 @@
         <!-- Filter Buttons -->
         <?php if (!empty($departments)): ?>
         <div class="flex flex-wrap justify-center gap-4 mb-12">
-            <button class="filter-btn active px-6 py-2 rounded-full border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white transition-all font-medium" data-filter="all">
+            <button class="filter-btn active px-6 py-2 rounded-full border border-primary-900 text-primary-900 hover:bg-primary-900 hover:text-white transition-all font-medium" data-filter="all">
                 All Departments
             </button>
             <?php foreach ($departments as $dept): ?>
-                <button class="filter-btn px-6 py-2 rounded-full border border-gray-300 text-gray-600 hover:border-primary-600 hover:text-primary-600 transition-all font-medium" data-filter="<?= htmlspecialchars(strtolower(str_replace(' ', '-', $dept['department']))) ?>">
+                <button class="filter-btn px-6 py-2 rounded-full border border-gray-300 text-gray-600 hover:border-primary-900 hover:text-primary-900 transition-all font-medium" data-filter="<?= htmlspecialchars(strtolower(str_replace(' ', '-', $dept['department']))) ?>">
                     <?= htmlspecialchars($dept['department']) ?>
                 </button>
             <?php endforeach; ?>
@@ -61,11 +61,11 @@
                     const cards = document.querySelectorAll('.program-card');
                     
                     // Simple active class toggle style
-                    const activeClass = ['bg-primary-600', 'text-white', 'border-primary-600'];
-                    const inactiveClass = ['bg-white', 'text-gray-600', 'border-gray-300', 'text-primary-600'];
+                    const activeClass = ['bg-primary-900', 'text-white', 'border-primary-900'];
+                    const inactiveClass = ['bg-white', 'text-gray-600', 'border-gray-300', 'text-primary-900'];
 
                     function setActive(btn) {
-                        btn.classList.remove('text-gray-600', 'text-primary-600', 'bg-white', 'border-gray-300');
+                        btn.classList.remove('text-gray-600', 'text-primary-900', 'bg-white', 'border-gray-300');
                         btn.classList.add(...activeClass);
                     }
 
@@ -73,7 +73,7 @@
                          btn.classList.remove(...activeClass);
                          btn.classList.add('bg-white', 'border-gray-300');
                          btn.classList.add('text-gray-600');
-                         btn.classList.add('hover:text-primary-600', 'hover:border-primary-600');
+                         btn.classList.add('hover:text-primary-900', 'hover:border-primary-900');
                     }
 
                     // Initialize
