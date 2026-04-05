@@ -5,6 +5,11 @@ define('APP_NAME', 'Kikam Technical Institute');
 define('APP_URL', 'https://kikamtech.org');
 define('ADMIN_URL', 'https://kikamtech.org/admin');
 
+// YouTube (@KikamTechnicalInstitute) — RSS shows latest uploads; set API key for full channel list via Data API v3
+define('YOUTUBE_CHANNEL_ID', 'UCA4fazj3TsAZelogMi8MS7w');
+define('YOUTUBE_CHANNEL_URL', 'https://www.youtube.com/@KikamTechnicalInstitute');
+define('YOUTUBE_API_KEY', ''); // optional: paste key from Google Cloud Console to load all uploads
+
 // Database Configuration
 define('DB_PATH', __DIR__ . '/../storage/database.sqlite');
 

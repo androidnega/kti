@@ -128,6 +128,7 @@
                     <a href="<?= APP_URL ?>" class="nav-link <?= empty($_GET['url']) || $_GET['url'] === 'home' ? 'nav-link-active' : '' ?>">Home</a>
                     <a href="<?= APP_URL ?>?url=history" class="nav-link <?= ($_GET['url'] ?? '') === 'history' ? 'nav-link-active' : '' ?>">History</a>
                     <a href="<?= APP_URL ?>?url=programs" class="nav-link <?= ($_GET['url'] ?? '') === 'programs' ? 'nav-link-active' : '' ?>">Programs</a>
+                    <a href="<?= APP_URL ?>?url=videos" class="nav-link <?= in_array($_GET['url'] ?? '', ['videos', 'youtube'], true) ? 'nav-link-active' : '' ?>">Videos</a>
                     <a href="<?= APP_URL ?>?url=staff" class="nav-link <?= ($_GET['url'] ?? '') === 'staff' ? 'nav-link-active' : '' ?>">Staff</a>
                     <a href="<?= APP_URL ?>?url=contact" class="nav-link <?= ($_GET['url'] ?? '') === 'contact' ? 'nav-link-active' : '' ?>">Contact</a>
                 </div>
@@ -153,6 +154,7 @@
                 <a href="<?= APP_URL ?>" class="block px-3 py-2 rounded-lg text-base font-medium <?= empty($_GET['url']) || $_GET['url'] === 'home' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Home</a>
                 <a href="<?= APP_URL ?>?url=history" class="block px-3 py-2 rounded-lg text-base font-medium <?= ($_GET['url'] ?? '') === 'history' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">History</a>
                 <a href="<?= APP_URL ?>?url=programs" class="block px-3 py-2 rounded-lg text-base font-medium <?= ($_GET['url'] ?? '') === 'programs' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Programs</a>
+                <a href="<?= APP_URL ?>?url=videos" class="block px-3 py-2 rounded-lg text-base font-medium <?= in_array($_GET['url'] ?? '', ['videos', 'youtube'], true) ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Videos</a>
                 <a href="<?= APP_URL ?>?url=staff" class="block px-3 py-2 rounded-lg text-base font-medium <?= ($_GET['url'] ?? '') === 'staff' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Staff</a>
                 <a href="<?= APP_URL ?>?url=contact" class="block px-3 py-2 rounded-lg text-base font-medium <?= ($_GET['url'] ?? '') === 'contact' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Contact</a>
             </div>
@@ -189,6 +191,7 @@
                         <li><a href="<?= APP_URL ?>" class="hover:text-white hover:underline transition-colors">Home</a></li>
                         <li><a href="<?= APP_URL ?>?url=history" class="hover:text-white hover:underline transition-colors">History</a></li>
                         <li><a href="<?= APP_URL ?>?url=programs" class="hover:text-white hover:underline transition-colors">Programs</a></li>
+                        <li><a href="<?= APP_URL ?>?url=videos" class="hover:text-white hover:underline transition-colors">Videos</a></li>
                     </ul>
                 </div>
 

@@ -3,6 +3,7 @@
 require_once APP_PATH . '/models/Page.php';
 require_once APP_PATH . '/models/Program.php';
 require_once APP_PATH . '/models/Staff.php';
+require_once APP_PATH . '/helpers/YoutubeFeed.php';
 
 class HomeController extends BaseController {
     private $pageModel;
@@ -54,6 +55,14 @@ class HomeController extends BaseController {
 
     public function history() {
         $this->view('history');
+    }
+
+    public function videos() {
+        list($videos, $feedError) = YoutubeFeed::fetchChannelVideos();
+        $this->view('videos', [
+            'videos' => $videos,
+            'feedError' => $feedError,
+        ]);
     }
 
     public function page($slug) {

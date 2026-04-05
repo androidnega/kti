@@ -21,6 +21,8 @@ if (empty($url) || $url === 'home') {
     $controller->staff();
 } elseif ($url === 'history') {
     $controller->history();
+} elseif ($url === 'videos' || $url === 'youtube') {
+    $controller->videos();
 } else {
     $controller->page($url);
 }
