@@ -112,7 +112,7 @@
                 <div class="absolute inset-0 bg-primary-600 rounded-2xl transform rotate-3 scale-105 opacity-10 pointer-events-none hidden md:block"></div>
                 <div class="relative rounded-2xl shadow-xl overflow-hidden aspect-video bg-black">
                     <iframe
-                        src="https://www.youtube.com/embed/_fgBVzVGSFU?autoplay=1&amp;mute=1&amp;controls=0&amp;modestbranding=1&amp;rel=0&amp;playsinline=1"
+                        src="https://www.youtube.com/embed/_fgBVzVGSFU?autoplay=1&amp;mute=0&amp;controls=0&amp;modestbranding=1&amp;rel=0&amp;playsinline=1"
                         title="Kikam Technical Institute"
                         class="absolute inset-0 w-full h-full border-0"
                         loading="lazy"

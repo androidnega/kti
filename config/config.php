@@ -18,6 +18,7 @@ define('YOUTUBE_CURATED_VIDEO_IDS', [
     'GVkQrtr5fQM',
     '5cxyVBU4R0E',
     'xenGD-Vxf10',
+    '_fgBVzVGSFU',
 ]);
 
 // Database Configuration
