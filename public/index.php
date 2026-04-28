@@ -23,6 +23,8 @@ if (empty($url) || $url === 'home') {
     $controller->history();
 } elseif ($url === 'videos' || $url === 'youtube') {
     $controller->videos();
+} elseif ($url === 'contact') {
+    $controller->contact();
 } else {
     $controller->page($url);
 }

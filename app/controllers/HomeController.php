@@ -76,6 +76,10 @@ class HomeController extends BaseController {
         ]);
     }
 
+    public function contact() {
+        $this->view('contact');
+    }
+
     public function page($slug) {
         $page = $this->pageModel->findBySlug($slug);
         
