@@ -27,7 +27,7 @@ foreach ($images as $img) {
 }
 $galleryCount = count($gallerySlides);
 $hasGallery = $galleryCount > 0;
-$mainColClass = $hasGallery ? 'lg:col-span-7' : 'lg:col-span-12';
+$bifold = $hasDetail && $hasGallery;
 
 ob_start();
 ?>
@@ -53,11 +53,12 @@ ob_start();
     </div>
 </section>
 
+<?php if ($hasDetail || $hasGallery): ?>
 <section class="border-b border-slate-200 bg-white py-10 sm:py-12 lg:py-14">
     <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12 xl:gap-14">
-            <div class="<?= htmlspecialchars($mainColClass) ?> min-w-0">
-                <?php if ($hasDetail): ?>
+        <div class="grid grid-cols-1 gap-10 <?= $bifold ? 'lg:grid-cols-12 lg:gap-12 xl:gap-14' : '' ?>">
+            <?php if ($hasDetail): ?>
+            <div class="<?= $bifold ? 'lg:col-span-7' : '' ?> min-w-0">
                     <div class="rounded-2xl border border-slate-200/90 bg-gradient-to-b from-slate-50/90 to-white p-5 shadow-sm sm:p-7 lg:p-8">
                         <h2 class="text-lg font-bold tracking-tight text-primary-900 sm:text-xl">About this department</h2>
                         <p class="mt-1 text-xs text-slate-500 sm:text-sm">Key information for students and visitors.</p>
@@ -89,13 +90,11 @@ ob_start();
                             <svg id="program-detail-toggle-icon" class="h-4 w-4 shrink-0 text-primary-600 transition-transform duration-300" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
                         </button>
                     </div>
-                <?php else: ?>
-                    <p class="rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 px-5 py-8 text-center text-sm text-slate-500">More information for this department will appear here when added in the admin panel.</p>
-                <?php endif; ?>
             </div>
+            <?php endif; ?>
 
             <?php if ($hasGallery): ?>
-                <aside class="min-w-0 lg:col-span-5">
+                <aside class="min-w-0 <?= $bifold ? 'lg:col-span-5' : '' ?>">
                     <div class="lg:sticky lg:top-24">
                         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                             <h2 class="text-base font-bold text-primary-900 sm:text-lg">Photo gallery</h2>
@@ -132,6 +131,7 @@ ob_start();
         </div>
     </div>
 </section>
+<?php endif; ?>
 
 <?php if ($hasGallery): ?>
 <style>

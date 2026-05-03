@@ -8,6 +8,13 @@ $slug = trim((string) ($program['slug'] ?? ''));
 $publicUrl = $slug !== '' ? (rtrim(APP_URL, '/') . '/?url=program/' . rawurlencode($slug)) : '';
 $isEdit = isset($program) && $programId > 0;
 $detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?? ''), ENT_QUOTES | (defined('ENT_HTML5') ? ENT_HTML5 : 0));
+$galleryImageCount = 0;
+foreach ($media as $_m) {
+    if (($_m['media_type'] ?? '') === 'image') {
+        $galleryImageCount++;
+    }
+}
+$galleryImagesFull = $galleryImageCount >= 9;
 ?>
 
 <!-- Toast -->
@@ -151,6 +158,7 @@ $detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?
             </p>
             <ul class="mt-2 list-inside list-disc space-y-1.5 text-xs leading-relaxed text-amber-900/90 sm:text-sm">
                 <li>Large photos are resized and compressed in your browser before upload, so the server gets a smaller JPEG (less memory errors). GIFs are unchanged.</li>
+                <li>Photo galleries are limited to nine images per department. You can queue many files; up to five upload at the same time until the limit is reached.</li>
                 <li>Gallery images and videos show a live preview while uploading; they are stored as soon as each upload finishes—Save is only for the text fields above (including the formatted detail editor).</li>
                 <li>Cover photo (if shown) uploads immediately too, or use “Set as cover” on a gallery image.</li>
                 <li>Large MP4 uploads may need a higher PHP <code class="rounded bg-amber-100/80 px-1">upload_max_filesize</code>.</li>
@@ -178,12 +186,13 @@ $detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?
     <div class="grid gap-8 p-4 sm:p-6 lg:grid-cols-2 lg:gap-10">
     <div>
             <h3 class="text-sm font-bold text-slate-800">Images</h3>
+            <p class="mt-0.5 text-xs font-medium text-slate-600"><?= (int) $galleryImageCount ?> of 9 photos<?= $galleryImageCount >= 9 ? ' (gallery full)' : '' ?></p>
             <p class="mt-1 text-xs text-slate-500 sm:text-sm">JPEG, PNG, WebP, or GIF — stored as optimized JPEG.</p>
-            <div id="drop-images" role="button" tabindex="0" aria-label="Upload images" class="mt-3 flex min-h-[min(12rem,40vh)] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/80 px-4 py-10 text-center transition hover:border-primary-400 hover:bg-primary-50/50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 active:scale-[0.99] sm:min-h-[11rem]">
+            <div id="drop-images" role="button" tabindex="0" aria-label="Upload images" class="mt-3 flex min-h-[min(12rem,40vh)] flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/80 px-4 py-10 text-center transition sm:min-h-[11rem] <?= $galleryImagesFull ? 'cursor-not-allowed opacity-60 pointer-events-none' : 'cursor-pointer hover:border-primary-400 hover:bg-primary-50/50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 active:scale-[0.99]' ?>">
                 <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-900 text-2xl text-accent-400 shadow-inner"><i class="fa-solid fa-cloud-arrow-up"></i></span>
                 <span class="max-w-xs text-sm font-medium text-slate-700">Drop images here or <span class="text-primary-700 underline decoration-2 underline-offset-2">tap to browse</span></span>
-                <span class="text-xs text-slate-500">Multiple files supported</span>
-                <input type="file" id="file-images" class="sr-only" accept="image/*" multiple>
+                <span class="text-xs text-slate-500">Select or drop many at once — up to five upload together. Each department can have up to nine photos.</span>
+                <input type="file" id="file-images" class="sr-only" accept="image/*" multiple<?= $galleryImagesFull ? ' disabled' : '' ?>>
             </div>
         </div>
         <div>
@@ -211,7 +220,7 @@ $detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?
                 <p class="text-xs text-slate-500 sm:text-sm">Drag <i class="fa-solid fa-grip-vertical text-slate-400"></i> to reorder. Saves automatically.</p>
             </div>
         </div>
-        <ul id="media-sortable" class="mt-4 space-y-3">
+        <ul id="media-sortable" class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             <?php foreach ($media as $m): ?>
             <?php
             $isVideo = ($m['media_type'] ?? '') === 'video';
@@ -220,45 +229,39 @@ $detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?
                 $thumb = rtrim(APP_URL, '/') . '/' . ltrim($m['file_path'], '/');
             }
             ?>
-            <li class="media-row group rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300 hover:shadow-md sm:p-4" data-id="<?= (int) $m['id'] ?>">
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-stretch">
-                    <div class="flex shrink-0 items-center gap-2 sm:flex-col sm:items-center sm:pt-1">
-                        <span class="drag-handle flex h-11 w-11 cursor-grab select-none items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 active:cursor-grabbing hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span>
-                    </div>
-                    <div class="relative h-40 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-24 sm:w-36 sm:flex-shrink-0">
+            <li class="media-row group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md" data-id="<?= (int) $m['id'] ?>" data-media-type="<?= $isVideo ? 'video' : 'image' ?>">
+                <div class="relative aspect-square w-full shrink-0 bg-slate-100">
+                    <span class="drag-handle absolute left-1 top-1 z-10 flex h-8 w-8 cursor-grab select-none items-center justify-center rounded-lg border border-slate-200/90 bg-white/95 text-slate-500 shadow-sm active:cursor-grabbing hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700" title="Drag to reorder"><i class="fa-solid fa-grip-vertical text-xs"></i></span>
                     <?php if ($isVideo): ?>
                         <div class="flex h-full w-full flex-col items-center justify-center gap-1 bg-slate-900/90 text-white">
-                            <i class="fa-solid fa-circle-play text-3xl text-accent-400"></i>
-                            <span class="text-xs font-bold uppercase tracking-wide">Video</span>
+                            <i class="fa-solid fa-circle-play text-2xl text-accent-400"></i>
+                            <span class="text-[10px] font-bold uppercase tracking-wide">Video</span>
                         </div>
                     <?php elseif ($thumb): ?>
-                        <img src="<?= htmlspecialchars($thumb) ?>" alt="" class="h-full w-full object-cover" loading="lazy" width="144" height="96">
+                        <img src="<?= htmlspecialchars($thumb) ?>" alt="" class="h-full w-full object-cover" loading="lazy" width="200" height="200">
                     <?php else: ?>
-                        <div class="flex h-full items-center justify-center text-xs text-slate-400">No preview</div>
+                        <div class="flex h-full items-center justify-center text-[10px] text-slate-400">No preview</div>
                     <?php endif; ?>
                 </div>
-                    <div class="min-w-0 flex-1 space-y-3">
-                        <form class="caption-form space-y-2" data-media-id="<?= (int) $m['id'] ?>">
-                            <label class="text-xs font-medium text-slate-600">Caption</label>
-                            <div class="flex flex-col gap-2 sm:flex-row sm:items-end">
-                                <input type="text" name="caption" class="input min-h-[44px] flex-1 rounded-xl border-slate-200 px-3 py-2.5 text-sm shadow-sm" value="<?= htmlspecialchars($m['caption'] ?? '') ?>" placeholder="Optional label">
-                                <button type="submit" class="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-primary-800 hover:bg-slate-50">Save</button>
-                            </div>
-                        </form>
-                        <div class="flex flex-wrap gap-2 border-t border-slate-100 pt-3">
-                            <?php if (!$isVideo && !empty($m['file_path'])): ?>
-                            <a href="<?= ADMIN_URL ?>?action=program_media_set_cover&id=<?= (int) $m['id'] ?>" class="inline-flex items-center gap-1.5 rounded-lg bg-accent-100 px-3 py-2 text-xs font-bold text-amber-950 hover:bg-accent-200"><i class="fa-regular fa-image"></i> Set as cover</a>
-                            <?php endif; ?>
-                            <a href="<?= ADMIN_URL ?>?action=program_media_delete&id=<?= (int) $m['id'] ?>" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800 hover:bg-red-100" onclick="return confirm('Delete this item?');"><i class="fa-regular fa-trash-can"></i> Delete</a>
-                        </div>
+                <div class="flex min-h-0 flex-1 flex-col gap-2 border-t border-slate-100 p-2">
+                    <form class="caption-form space-y-1" data-media-id="<?= (int) $m['id'] ?>">
+                        <label class="sr-only">Caption</label>
+                        <input type="text" name="caption" class="input w-full rounded-lg border-slate-200 px-2 py-1.5 text-xs shadow-sm" value="<?= htmlspecialchars($m['caption'] ?? '') ?>" placeholder="Caption">
+                        <button type="submit" class="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 text-[11px] font-semibold text-primary-800 hover:bg-slate-100">Save caption</button>
+                    </form>
+                    <div class="flex flex-wrap gap-1 border-t border-slate-100 pt-2">
+                        <?php if (!$isVideo && !empty($m['file_path'])): ?>
+                        <a href="<?= ADMIN_URL ?>?action=program_media_set_cover&id=<?= (int) $m['id'] ?>" class="inline-flex flex-1 items-center justify-center gap-1 rounded-md bg-accent-100 px-1.5 py-1 text-[10px] font-bold text-amber-950 hover:bg-accent-200 sm:text-[11px]"><i class="fa-regular fa-image text-[10px]"></i> Cover</a>
+                        <?php endif; ?>
+                        <a href="<?= ADMIN_URL ?>?action=program_media_delete&id=<?= (int) $m['id'] ?>" class="inline-flex flex-1 items-center justify-center gap-1 rounded-md border border-red-200 bg-red-50 px-1.5 py-1 text-[10px] font-semibold text-red-800 hover:bg-red-100 sm:text-[11px]" onclick="return confirm('Delete this item?');"><i class="fa-regular fa-trash-can text-[10px]"></i> Delete</a>
                     </div>
                 </div>
             </li>
             <?php endforeach; ?>
+            <?php if (empty($media)): ?>
+            <li id="media-empty-hint" class="col-span-full rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">No media yet. Use the zones above to add images or videos.</li>
+            <?php endif; ?>
         </ul>
-        <?php if (empty($media)): ?>
-        <p class="mt-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500" id="media-empty-hint">No media yet. Use the zones above to add images or videos.</p>
-        <?php endif; ?>
     </div>
 </section>
 
@@ -455,26 +458,23 @@ $detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?
         clearMediaEmptyHint();
         var objUrl = URL.createObjectURL(file);
         var li = document.createElement('li');
-        li.className = 'media-row group rounded-2xl border-2 border-dashed border-primary-400 bg-primary-50/50 p-3 sm:p-4';
+        li.className = 'media-row group flex flex-col overflow-hidden rounded-xl border-2 border-dashed border-primary-400 bg-primary-50/50';
         li.setAttribute('data-upload-pending', '1');
+        li.setAttribute('data-media-type', 'pending-image');
         li._previewObjectUrl = objUrl;
         li.innerHTML =
-            '<div class="flex flex-col gap-3 sm:flex-row sm:items-stretch">' +
-            '<div class="flex shrink-0 items-center gap-2 sm:flex-col sm:items-center sm:pt-1">' +
-            '<span class="drag-handle flex h-11 w-11 cursor-not-allowed select-none items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-400" title="Uploading…"><i class="fa-solid fa-grip-vertical"></i></span>' +
-            '</div>' +
-            '<div class="relative h-40 w-full overflow-hidden rounded-xl bg-slate-900/5 sm:h-24 sm:w-36 sm:flex-shrink-0">' +
-            '<img src="' + escAttr(objUrl) + '" alt="" class="h-full w-full object-cover opacity-90" width="144" height="96">' +
-            '<div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center bg-slate-900/55 text-white">' +
-            '<span class="pending-pct text-lg font-bold tabular-nums">0%</span>' +
-            '<div class="mx-3 mt-2 h-1.5 w-[calc(100%-1.5rem)] max-w-[7rem] overflow-hidden rounded-full bg-white/25">' +
+            '<div class="relative aspect-square w-full shrink-0 bg-slate-900/5">' +
+            '<span class="drag-handle absolute left-1 top-1 z-10 flex h-8 w-8 cursor-not-allowed select-none items-center justify-center rounded-lg border border-slate-200 bg-white/90 text-slate-400 shadow-sm" title="Uploading…"><i class="fa-solid fa-grip-vertical text-xs"></i></span>' +
+            '<img src="' + escAttr(objUrl) + '" alt="" class="h-full w-full object-cover opacity-90" width="200" height="200">' +
+            '<div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center bg-slate-900/55 px-2 text-white">' +
+            '<span class="pending-pct text-sm font-bold tabular-nums">0%</span>' +
+            '<div class="mx-2 mt-1.5 h-1 w-full max-w-[5rem] overflow-hidden rounded-full bg-white/25">' +
             '<div class="pending-pct-bar h-full rounded-full bg-accent-400 transition-[width] duration-100" style="width:0%"></div></div>' +
-            '<i class="fa-solid fa-cloud-arrow-up mt-2 text-xl opacity-90"></i>' +
+            '<i class="fa-solid fa-cloud-arrow-up mt-1.5 text-lg opacity-90"></i>' +
             '</div></div>' +
-            '<div class="min-w-0 flex-1 flex flex-col justify-center py-1 text-xs text-slate-600">' +
-            '<p class="font-medium text-slate-800">New image</p>' +
-            '<p class="pending-iname mt-1 truncate font-mono text-[11px] text-slate-500"></p>' +
-            '</div></div>';
+            '<div class="border-t border-primary-200/60 p-2 text-[10px] text-slate-600">' +
+            '<p class="font-medium text-slate-800">Uploading…</p>' +
+            '<p class="pending-iname mt-0.5 truncate font-mono text-[9px] text-slate-500"></p></div>';
         var nameP = li.querySelector('.pending-iname');
         if (nameP) nameP.textContent = file.name || 'image';
         list.appendChild(li);
@@ -486,20 +486,20 @@ $detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?
         if (!list || !file) return null;
         clearMediaEmptyHint();
         var li = document.createElement('li');
-        li.className = 'media-row group rounded-2xl border-2 border-dashed border-slate-400 bg-slate-50 p-3 sm:p-4';
+        li.className = 'media-row group flex flex-col overflow-hidden rounded-xl border-2 border-dashed border-slate-400 bg-slate-50';
         li.setAttribute('data-upload-pending', '1');
+        li.setAttribute('data-media-type', 'video');
         li.innerHTML =
-            '<div class="flex flex-col gap-3 sm:flex-row sm:items-stretch">' +
-            '<div class="flex shrink-0 items-center gap-2 sm:flex-col sm:items-center sm:pt-1">' +
-            '<span class="drag-handle flex h-11 w-11 cursor-not-allowed select-none items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400"><i class="fa-solid fa-grip-vertical"></i></span></div>' +
-            '<div class="relative flex h-40 w-full items-center justify-center rounded-xl bg-slate-800 sm:h-24 sm:w-36 sm:flex-shrink-0">' +
-            '<i class="fa-solid fa-spinner fa-spin text-3xl text-white"></i></div>' +
-            '<div class="min-w-0 flex-1 flex flex-col justify-center gap-2 py-1 text-xs text-slate-600">' +
-            '<p class="font-medium text-slate-800">Uploading video</p>' +
-            '<p class="pending-vname truncate font-mono text-[11px] text-slate-500"></p>' +
-            '<span class="pending-pct text-sm font-bold tabular-nums text-slate-800">0%</span>' +
-            '<div class="h-1.5 w-full max-w-[10rem] overflow-hidden rounded-full bg-slate-200">' +
-            '<div class="pending-pct-bar h-full rounded-full bg-slate-700 transition-[width] duration-100" style="width:0%"></div></div></div></div>';
+            '<div class="relative aspect-square w-full shrink-0 bg-slate-800">' +
+            '<span class="drag-handle absolute left-1 top-1 z-10 flex h-8 w-8 cursor-not-allowed select-none items-center justify-center rounded-lg border border-slate-600 bg-slate-900/80 text-slate-400"><i class="fa-solid fa-grip-vertical text-xs"></i></span>' +
+            '<div class="flex h-full w-full flex-col items-center justify-center gap-1 text-white">' +
+            '<i class="fa-solid fa-spinner fa-spin text-2xl"></i>' +
+            '<span class="pending-pct text-xs font-bold tabular-nums">0%</span>' +
+            '<div class="mx-4 h-1 w-[calc(100%-2rem)] max-w-[5rem] overflow-hidden rounded-full bg-white/20">' +
+            '<div class="pending-pct-bar h-full rounded-full bg-accent-400 transition-[width] duration-100" style="width:0%"></div></div></div></div>' +
+            '<div class="border-t border-slate-200 p-2 text-[10px] text-slate-600">' +
+            '<p class="font-medium text-slate-800">Video upload</p>' +
+            '<p class="pending-vname truncate font-mono text-[9px] text-slate-500"></p></div>';
         var vn = li.querySelector('.pending-vname');
         if (vn) vn.textContent = file.name || 'video';
         list.appendChild(li);
@@ -511,27 +511,24 @@ $detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?
         if (!list || !j || !j.id || !j.url) return;
         clearMediaEmptyHint();
         var li = document.createElement('li');
-        li.className = 'media-row group rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300 hover:shadow-md sm:p-4';
+        li.className = 'media-row group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md';
         li.setAttribute('data-id', String(j.id));
+        li.setAttribute('data-media-type', 'image');
         li.innerHTML =
-            '<div class="flex flex-col gap-3 sm:flex-row sm:items-stretch">' +
-            '<div class="flex shrink-0 items-center gap-2 sm:flex-col sm:items-center sm:pt-1">' +
-            '<span class="drag-handle flex h-11 w-11 cursor-grab select-none items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 active:cursor-grabbing hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span>' +
+            '<div class="relative aspect-square w-full shrink-0 bg-slate-100">' +
+            '<span class="drag-handle absolute left-1 top-1 z-10 flex h-8 w-8 cursor-grab select-none items-center justify-center rounded-lg border border-slate-200/90 bg-white/95 text-slate-500 shadow-sm active:cursor-grabbing hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700" title="Drag to reorder"><i class="fa-solid fa-grip-vertical text-xs"></i></span>' +
+            '<img src="' + escAttr(j.url) + '" alt="" class="h-full w-full object-cover" loading="lazy" width="200" height="200">' +
             '</div>' +
-            '<div class="relative h-40 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-24 sm:w-36 sm:flex-shrink-0">' +
-            '<img src="' + escAttr(j.url) + '" alt="" class="h-full w-full object-cover" loading="lazy" width="144" height="96">' +
-            '</div>' +
-            '<div class="min-w-0 flex-1 space-y-3">' +
-            '<form class="caption-form space-y-2" data-media-id="' + escAttr(String(j.id)) + '">' +
-            '<label class="text-xs font-medium text-slate-600">Caption</label>' +
-            '<div class="flex flex-col gap-2 sm:flex-row sm:items-end">' +
-            '<input type="text" name="caption" class="input min-h-[44px] flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm shadow-sm" value="" placeholder="Optional label">' +
-            '<button type="submit" class="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-primary-800 hover:bg-slate-50">Save</button>' +
-            '</div></form>' +
-            '<div class="flex flex-wrap gap-2 border-t border-slate-100 pt-3">' +
-            '<a href="' + escAttr(ADMIN_URL + '?action=program_media_set_cover&id=' + j.id) + '" class="inline-flex items-center gap-1.5 rounded-lg bg-accent-100 px-3 py-2 text-xs font-bold text-amber-950 hover:bg-accent-200"><i class="fa-regular fa-image"></i> Set as cover</a>' +
-            '<a href="' + escAttr(ADMIN_URL + '?action=program_media_delete&id=' + j.id) + '" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800 hover:bg-red-100" onclick="return confirm(\'Delete this item?\');"><i class="fa-regular fa-trash-can"></i> Delete</a>' +
-            '</div></div></div>';
+            '<div class="flex min-h-0 flex-1 flex-col gap-2 border-t border-slate-100 p-2">' +
+            '<form class="caption-form space-y-1" data-media-id="' + escAttr(String(j.id)) + '">' +
+            '<label class="sr-only">Caption</label>' +
+            '<input type="text" name="caption" class="input w-full rounded-lg border-slate-200 px-2 py-1.5 text-xs shadow-sm" value="" placeholder="Caption">' +
+            '<button type="submit" class="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 text-[11px] font-semibold text-primary-800 hover:bg-slate-100">Save caption</button>' +
+            '</form>' +
+            '<div class="flex flex-wrap gap-1 border-t border-slate-100 pt-2">' +
+            '<a href="' + escAttr(ADMIN_URL + '?action=program_media_set_cover&id=' + j.id) + '" class="inline-flex flex-1 items-center justify-center gap-1 rounded-md bg-accent-100 px-1.5 py-1 text-[10px] font-bold text-amber-950 hover:bg-accent-200 sm:text-[11px]"><i class="fa-regular fa-image text-[10px]"></i> Cover</a>' +
+            '<a href="' + escAttr(ADMIN_URL + '?action=program_media_delete&id=' + j.id) + '" class="inline-flex flex-1 items-center justify-center gap-1 rounded-md border border-red-200 bg-red-50 px-1.5 py-1 text-[10px] font-semibold text-red-800 hover:bg-red-100 sm:text-[11px]" onclick="return confirm(\'Delete this item?\');"><i class="fa-regular fa-trash-can text-[10px]"></i> Delete</a>' +
+            '</div></div>';
         list.appendChild(li);
     }
 
@@ -540,26 +537,23 @@ $detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?
         if (!list || !j || !j.id) return;
         clearMediaEmptyHint();
         var li = document.createElement('li');
-        li.className = 'media-row group rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300 hover:shadow-md sm:p-4';
+        li.className = 'media-row group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md';
         li.setAttribute('data-id', String(j.id));
+        li.setAttribute('data-media-type', 'video');
         li.innerHTML =
-            '<div class="flex flex-col gap-3 sm:flex-row sm:items-stretch">' +
-            '<div class="flex shrink-0 items-center gap-2 sm:flex-col sm:items-center sm:pt-1">' +
-            '<span class="drag-handle flex h-11 w-11 cursor-grab select-none items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 active:cursor-grabbing hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span>' +
-            '</div>' +
-            '<div class="relative h-40 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-24 sm:w-36 sm:flex-shrink-0">' +
-            '<div class="flex h-full w-full flex-col items-center justify-center gap-1 bg-slate-900/90 text-white">' +
-            '<i class="fa-solid fa-circle-play text-3xl text-accent-400"></i><span class="text-xs font-bold uppercase tracking-wide">Video</span></div></div>' +
-            '<div class="min-w-0 flex-1 space-y-3">' +
-            '<form class="caption-form space-y-2" data-media-id="' + escAttr(String(j.id)) + '">' +
-            '<label class="text-xs font-medium text-slate-600">Caption</label>' +
-            '<div class="flex flex-col gap-2 sm:flex-row sm:items-end">' +
-            '<input type="text" name="caption" class="input min-h-[44px] flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm shadow-sm" value="" placeholder="Optional label">' +
-            '<button type="submit" class="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-primary-800 hover:bg-slate-50">Save</button>' +
-            '</div></form>' +
-            '<div class="flex flex-wrap gap-2 border-t border-slate-100 pt-3">' +
-            '<a href="' + escAttr(ADMIN_URL + '?action=program_media_delete&id=' + j.id) + '" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800 hover:bg-red-100" onclick="return confirm(\'Delete this item?\');"><i class="fa-regular fa-trash-can"></i> Delete</a>' +
-            '</div></div></div>';
+            '<div class="relative aspect-square w-full shrink-0 bg-slate-900/90">' +
+            '<span class="drag-handle absolute left-1 top-1 z-10 flex h-8 w-8 cursor-grab select-none items-center justify-center rounded-lg border border-slate-600 bg-slate-900/80 text-slate-300 active:cursor-grabbing hover:bg-slate-800" title="Drag to reorder"><i class="fa-solid fa-grip-vertical text-xs"></i></span>' +
+            '<div class="flex h-full w-full flex-col items-center justify-center gap-1 text-white">' +
+            '<i class="fa-solid fa-circle-play text-2xl text-accent-400"></i><span class="text-[10px] font-bold uppercase tracking-wide">Video</span></div></div>' +
+            '<div class="flex min-h-0 flex-1 flex-col gap-2 border-t border-slate-100 p-2">' +
+            '<form class="caption-form space-y-1" data-media-id="' + escAttr(String(j.id)) + '">' +
+            '<label class="sr-only">Caption</label>' +
+            '<input type="text" name="caption" class="input w-full rounded-lg border-slate-200 px-2 py-1.5 text-xs shadow-sm" value="" placeholder="Caption">' +
+            '<button type="submit" class="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 text-[11px] font-semibold text-primary-800 hover:bg-slate-100">Save caption</button>' +
+            '</form>' +
+            '<div class="flex flex-wrap gap-1 border-t border-slate-100 pt-2">' +
+            '<a href="' + escAttr(ADMIN_URL + '?action=program_media_delete&id=' + j.id) + '" class="inline-flex w-full items-center justify-center gap-1 rounded-md border border-red-200 bg-red-50 px-1.5 py-1 text-[10px] font-semibold text-red-800 hover:bg-red-100 sm:text-[11px]" onclick="return confirm(\'Delete this item?\');"><i class="fa-regular fa-trash-can text-[10px]"></i> Delete</a>' +
+            '</div></div>';
         list.appendChild(li);
     }
 
@@ -568,27 +562,24 @@ $detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?
         if (!list || !j || !j.id || !j.external_url) return;
         clearMediaEmptyHint();
         var li = document.createElement('li');
-        li.className = 'media-row group rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300 hover:shadow-md sm:p-4';
+        li.className = 'media-row group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-slate-300 hover:shadow-md';
         li.setAttribute('data-id', String(j.id));
+        li.setAttribute('data-media-type', 'video');
         li.innerHTML =
-            '<div class="flex flex-col gap-3 sm:flex-row sm:items-stretch">' +
-            '<div class="flex shrink-0 items-center gap-2 sm:flex-col sm:items-center sm:pt-1">' +
-            '<span class="drag-handle flex h-11 w-11 cursor-grab select-none items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 active:cursor-grabbing hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span>' +
-            '</div>' +
-            '<div class="relative h-40 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-24 sm:w-36 sm:flex-shrink-0">' +
-            '<div class="flex h-full w-full flex-col items-center justify-center gap-1 bg-slate-900/90 text-white">' +
-            '<i class="fa-solid fa-circle-play text-3xl text-accent-400"></i><span class="text-xs font-bold uppercase tracking-wide">Video</span></div></div>' +
-            '<div class="min-w-0 flex-1 space-y-3">' +
-            '<p class="text-xs text-slate-500 break-all"><a href="' + escAttr(j.external_url) + '" target="_blank" rel="noopener" class="text-primary-700 hover:underline">' + escAttr(j.external_url) + '</a></p>' +
-            '<form class="caption-form space-y-2" data-media-id="' + escAttr(String(j.id)) + '">' +
-            '<label class="text-xs font-medium text-slate-600">Caption</label>' +
-            '<div class="flex flex-col gap-2 sm:flex-row sm:items-end">' +
-            '<input type="text" name="caption" class="input min-h-[44px] flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm shadow-sm" value="" placeholder="Optional label">' +
-            '<button type="submit" class="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-primary-800 hover:bg-slate-50">Save</button>' +
-            '</div></form>' +
-            '<div class="flex flex-wrap gap-2 border-t border-slate-100 pt-3">' +
-            '<a href="' + escAttr(ADMIN_URL + '?action=program_media_delete&id=' + j.id) + '" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800 hover:bg-red-100" onclick="return confirm(\'Delete this item?\');"><i class="fa-regular fa-trash-can"></i> Delete</a>' +
-            '</div></div></div>';
+            '<div class="relative aspect-square w-full shrink-0 bg-slate-900/90">' +
+            '<span class="drag-handle absolute left-1 top-1 z-10 flex h-8 w-8 cursor-grab select-none items-center justify-center rounded-lg border border-slate-600 bg-slate-900/80 text-slate-300 active:cursor-grabbing hover:bg-slate-800" title="Drag to reorder"><i class="fa-solid fa-grip-vertical text-xs"></i></span>' +
+            '<div class="flex h-full w-full flex-col items-center justify-center gap-1 px-2 text-center text-white">' +
+            '<i class="fa-solid fa-circle-play text-2xl text-accent-400"></i><span class="text-[10px] font-bold uppercase tracking-wide">Video</span>' +
+            '<a href="' + escAttr(j.external_url) + '" target="_blank" rel="noopener" class="line-clamp-2 max-w-full break-all text-[9px] text-primary-200 underline">Open link</a></div></div>' +
+            '<div class="flex min-h-0 flex-1 flex-col gap-2 border-t border-slate-100 p-2">' +
+            '<form class="caption-form space-y-1" data-media-id="' + escAttr(String(j.id)) + '">' +
+            '<label class="sr-only">Caption</label>' +
+            '<input type="text" name="caption" class="input w-full rounded-lg border-slate-200 px-2 py-1.5 text-xs shadow-sm" value="" placeholder="Caption">' +
+            '<button type="submit" class="w-full rounded-lg border border-slate-200 bg-slate-50 py-1.5 text-[11px] font-semibold text-primary-800 hover:bg-slate-100">Save caption</button>' +
+            '</form>' +
+            '<div class="flex flex-wrap gap-1 border-t border-slate-100 pt-2">' +
+            '<a href="' + escAttr(ADMIN_URL + '?action=program_media_delete&id=' + j.id) + '" class="inline-flex w-full items-center justify-center gap-1 rounded-md border border-red-200 bg-red-50 px-1.5 py-1 text-[10px] font-semibold text-red-800 hover:bg-red-100 sm:text-[11px]" onclick="return confirm(\'Delete this item?\');"><i class="fa-regular fa-trash-can text-[10px]"></i> Delete</a>' +
+            '</div></div>';
         list.appendChild(li);
     }
 
@@ -673,13 +664,61 @@ $detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?
         return doXhr(file);
     }
 
+    var GALLERY_MAX_IMAGES = 9;
+    var UPLOAD_BATCH_CONCURRENCY = 5;
+
+    function countGalleryImageSlots() {
+        var list = document.getElementById('media-sortable');
+        if (!list) return 0;
+        var n = 0;
+        list.querySelectorAll('li.media-row').forEach(function (el) {
+            var t = el.getAttribute('data-media-type') || '';
+            if (t === 'image' || t === 'pending-image') n += 1;
+        });
+        return n;
+    }
+
+    function updateGalleryDropZone() {
+        var zone = document.getElementById('drop-images');
+        var input = document.getElementById('file-images');
+        if (!zone) return;
+        var full = countGalleryImageSlots() >= GALLERY_MAX_IMAGES;
+        ['pointer-events-none', 'opacity-60', 'cursor-not-allowed'].forEach(function (c) {
+            zone.classList.toggle(c, full);
+        });
+        ['cursor-pointer', 'hover:border-primary-400', 'hover:bg-primary-50/50', 'focus:outline-none', 'focus:ring-2', 'focus:ring-primary-500', 'focus:ring-offset-2', 'active:scale-[0.99]'].forEach(function (c) {
+            zone.classList.toggle(c, !full);
+        });
+        if (input) input.disabled = !!full;
+    }
+
     function uploadFiles(action, files, onEach) {
         if (!files || !files.length) return Promise.resolve();
-        var p = Promise.resolve();
-        var i;
-        for (i = 0; i < files.length; i++) {
-            (function (file) {
-                p = p.then(function () {
+        var arr = Array.prototype.slice.call(files, 0);
+        if (action === 'program_media_upload') {
+            var cur = countGalleryImageSlots();
+            var slots = GALLERY_MAX_IMAGES - cur;
+            if (slots <= 0) {
+                showToast('This gallery already has nine photos. Remove one to add another.', true);
+                return Promise.resolve();
+            }
+            arr = arr.filter(function (f) { return /^image\//i.test(f.type || ''); });
+            if (!arr.length) {
+                showToast('No image files in your selection.', true);
+                return Promise.resolve();
+            }
+            if (arr.length > slots) {
+                showToast('Galleries are limited to nine photos. Added ' + slots + ' file(s); the rest were skipped.', true);
+                arr = arr.slice(0, slots);
+            }
+        }
+        var idx = 0;
+        function runBatch() {
+            var batch = arr.slice(idx, idx + UPLOAD_BATCH_CONCURRENCY);
+            idx += UPLOAD_BATCH_CONCURRENCY;
+            if (!batch.length) return Promise.resolve();
+            return Promise.all(
+                batch.map(function (file) {
                     var pending = null;
                     if (action === 'program_media_upload') {
                         pending = appendPendingImageRow(file);
@@ -688,18 +727,23 @@ $detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?
                     }
                     return uploadOneFile(action, file, function (pct) {
                         if (pending) setPendingProgress(pending, pct);
-                    }).then(function (j) {
-                        if (pending) removePendingRow(pending);
-                        if (onEach) onEach(j, action);
-                        return j;
-                    }).catch(function (err) {
-                        if (pending) removePendingRow(pending);
-                        throw err;
-                    });
-                });
-            })(files[i]);
+                    })
+                        .then(function (j) {
+                            if (pending) removePendingRow(pending);
+                            if (onEach) onEach(j, action);
+                            return j;
+                        })
+                        .catch(function (err) {
+                            if (pending) removePendingRow(pending);
+                            showToast(err.message || String(err), true);
+                            return null;
+                        });
+                })
+            ).then(function () {
+                return runBatch();
+            });
         }
-        return p;
+        return runBatch();
     }
 
     function wireDrop(zoneId, inputId, action) {
@@ -724,16 +768,21 @@ $detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?
         zone.addEventListener('drop', function (e) {
             var files = e.dataTransfer.files;
             showToast('Uploading…');
-            uploadFiles(action, files, onDone).then(function () { showToast('Upload complete'); }).catch(function (err) { showToast(err.message || String(err), true); });
+            uploadFiles(action, files, onDone)
+                .then(function () { showToast('Upload complete'); updateGalleryDropZone(); })
+                .catch(function (err) { showToast(err.message || String(err), true); updateGalleryDropZone(); });
         });
         input.addEventListener('change', function () {
             showToast('Uploading…');
-            uploadFiles(action, input.files, onDone).then(function () { showToast('Upload complete'); input.value = ''; }).catch(function (err) { showToast(err.message || String(err), true); });
+            uploadFiles(action, input.files, onDone)
+                .then(function () { showToast('Upload complete'); input.value = ''; updateGalleryDropZone(); })
+                .catch(function (err) { showToast(err.message || String(err), true); input.value = ''; updateGalleryDropZone(); });
         });
     }
 
     wireDrop('drop-images', 'file-images', 'program_media_upload');
     wireDrop('drop-videos', 'file-videos', 'program_video_upload');
+    updateGalleryDropZone();
 
     var urlForm = document.getElementById('form-video-url');
     if (urlForm) {

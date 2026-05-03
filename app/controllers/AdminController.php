@@ -174,6 +174,19 @@ class AdminController extends BaseController {
             $this->json(['ok' => false, 'error' => 'No file uploaded'], 400);
         }
 
+        $maxGalleryImages = 9;
+        $cntRow = Database::getInstance()->fetchOne(
+            'SELECT COUNT(*) AS c FROM program_media WHERE program_id = ? AND media_type = ?',
+            [$programId, 'image']
+        );
+        $imageCount = $cntRow && isset($cntRow['c']) ? (int) $cntRow['c'] : 0;
+        if ($imageCount >= $maxGalleryImages) {
+            $this->json([
+                'ok' => false,
+                'error' => 'This gallery already has the maximum of ' . $maxGalleryImages . ' photos. Remove one to add another.',
+            ], 400);
+        }
+
         $tmp = $_FILES['file']['tmp_name'];
         $info = @getimagesize($tmp);
         if ($info === false) {
