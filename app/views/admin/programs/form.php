@@ -90,9 +90,12 @@ $isEdit = isset($program) && $programId > 0;
                                 <div class="relative h-28 w-40 shrink-0 overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
                                     <img id="program-cover-preview-img" src="<?= $coverPreviewAbs !== '' ? htmlspecialchars($coverPreviewAbs) : '' ?>" alt="" class="h-full w-full object-cover <?= $coverPreviewAbs === '' ? 'hidden' : '' ?>" width="160" height="112">
                                     <div id="program-cover-preview-empty" class="<?= $coverPreviewAbs !== '' ? 'hidden' : '' ?> flex h-full w-full items-center justify-center px-2 text-center text-xs text-slate-400">No cover yet</div>
-                                    <div id="program-cover-uploading" class="pointer-events-none absolute inset-0 hidden flex-col items-center justify-center bg-slate-900/75 text-white">
-                                        <i class="fa-solid fa-spinner fa-spin text-xl"></i>
-                                        <span class="mt-1 text-[10px] font-semibold uppercase tracking-wide">Uploading</span>
+                                    <div id="program-cover-uploading" class="pointer-events-none absolute inset-0 hidden flex-col items-center justify-center bg-slate-900/80 px-2 text-white">
+                                        <span id="program-cover-pct" class="text-lg font-bold tabular-nums">0%</span>
+                                        <div class="mt-2 h-1.5 w-full max-w-[7rem] overflow-hidden rounded-full bg-white/25">
+                                            <div id="program-cover-pct-bar" class="h-full rounded-full bg-accent-400 transition-[width] duration-100" style="width:0%"></div>
+                                        </div>
+                                        <span class="mt-2 text-[9px] font-semibold uppercase tracking-wide text-white/90">Uploading</span>
                                     </div>
                                 </div>
                                 <div class="min-w-0 flex-1 space-y-2">
@@ -336,8 +339,10 @@ $isEdit = isset($program) && $programId > 0;
             '<div class="relative h-40 w-full overflow-hidden rounded-xl bg-slate-900/5 sm:h-24 sm:w-36 sm:flex-shrink-0">' +
             '<img src="' + escAttr(objUrl) + '" alt="" class="h-full w-full object-cover opacity-90" width="144" height="96">' +
             '<div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center bg-slate-900/55 text-white">' +
-            '<i class="fa-solid fa-cloud-arrow-up text-2xl animate-pulse"></i>' +
-            '<span class="mt-2 max-w-[10rem] truncate px-2 text-center text-[10px] font-semibold uppercase tracking-wide">Uploading</span>' +
+            '<span class="pending-pct text-lg font-bold tabular-nums">0%</span>' +
+            '<div class="mx-3 mt-2 h-1.5 w-[calc(100%-1.5rem)] max-w-[7rem] overflow-hidden rounded-full bg-white/25">' +
+            '<div class="pending-pct-bar h-full rounded-full bg-accent-400 transition-[width] duration-100" style="width:0%"></div></div>' +
+            '<i class="fa-solid fa-cloud-arrow-up mt-2 text-xl opacity-90"></i>' +
             '</div></div>' +
             '<div class="min-w-0 flex-1 flex flex-col justify-center py-1 text-xs text-slate-600">' +
             '<p class="font-medium text-slate-800">New image</p>' +
@@ -362,8 +367,12 @@ $isEdit = isset($program) && $programId > 0;
             '<span class="drag-handle flex h-11 w-11 cursor-not-allowed select-none items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400"><i class="fa-solid fa-grip-vertical"></i></span></div>' +
             '<div class="relative flex h-40 w-full items-center justify-center rounded-xl bg-slate-800 sm:h-24 sm:w-36 sm:flex-shrink-0">' +
             '<i class="fa-solid fa-spinner fa-spin text-3xl text-white"></i></div>' +
-            '<div class="min-w-0 flex-1 flex flex-col justify-center py-1 text-xs text-slate-600">' +
-            '<p class="font-medium text-slate-800">Uploading video</p><p class="pending-vname mt-1 truncate font-mono text-[11px] text-slate-500"></p></div></div>';
+            '<div class="min-w-0 flex-1 flex flex-col justify-center gap-2 py-1 text-xs text-slate-600">' +
+            '<p class="font-medium text-slate-800">Uploading video</p>' +
+            '<p class="pending-vname truncate font-mono text-[11px] text-slate-500"></p>' +
+            '<span class="pending-pct text-sm font-bold tabular-nums text-slate-800">0%</span>' +
+            '<div class="h-1.5 w-full max-w-[10rem] overflow-hidden rounded-full bg-slate-200">' +
+            '<div class="pending-pct-bar h-full rounded-full bg-slate-700 transition-[width] duration-100" style="width:0%"></div></div></div></div>';
         var vn = li.querySelector('.pending-vname');
         if (vn) vn.textContent = file.name || 'video';
         list.appendChild(li);
@@ -465,12 +474,54 @@ $isEdit = isset($program) && $programId > 0;
         });
     }
 
-    function uploadOneFile(action, file) {
+    function setPendingProgress(li, pct) {
+        if (!li) return;
+        var t = li.querySelector('.pending-pct');
+        var b = li.querySelector('.pending-pct-bar');
+        if (pct == null || typeof pct !== 'number' || pct < 0) {
+            if (t) t.textContent = '…';
+            return;
+        }
+        if (t) t.textContent = pct + '%';
+        if (b) b.style.width = pct + '%';
+    }
+
+    function xhrUploadWithJson(url, formData, onProgress) {
+        return new Promise(function (resolve, reject) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.withCredentials = true;
+            xhr.upload.addEventListener('progress', function (ev) {
+                if (!onProgress || !ev.lengthComputable || ev.total <= 0) return;
+                onProgress(Math.min(100, Math.round((100 * ev.loaded) / ev.total)));
+            });
+            xhr.onload = function () {
+                var text = xhr.responseText || '';
+                var j;
+                try {
+                    j = JSON.parse(text);
+                } catch (e) {
+                    reject(new Error(text ? text.slice(0, 160) : xhr.statusText));
+                    return;
+                }
+                if (xhr.status < 200 || xhr.status >= 300 || !j || !j.ok) {
+                    reject(new Error((j && j.error) ? j.error : (xhr.statusText || 'Request failed')));
+                    return;
+                }
+                if (onProgress) onProgress(100);
+                resolve(j);
+            };
+            xhr.onerror = function () { reject(new Error('Network error')); };
+            xhr.send(formData);
+        });
+    }
+
+    function uploadOneFile(action, file, onProgress) {
         var fd = new FormData();
         fd.append('program_id', String(PROGRAM_ID));
         fd.append('file', file);
         var url = ADMIN_API + '?action=' + encodeURIComponent(action) + '&program_id=' + encodeURIComponent(String(PROGRAM_ID));
-        return fetch(url, { method: 'POST', body: fd, credentials: 'same-origin' }).then(parseJsonResponse);
+        return xhrUploadWithJson(url, fd, onProgress);
     }
 
     function uploadFiles(action, files, onEach) {
@@ -486,7 +537,9 @@ $isEdit = isset($program) && $programId > 0;
                     } else if (action === 'program_video_upload') {
                         pending = appendPendingVideoRow(file);
                     }
-                    return uploadOneFile(action, file).then(function (j) {
+                    return uploadOneFile(action, file, function (pct) {
+                        if (pending) setPendingProgress(pending, pct);
+                    }).then(function (j) {
                         if (pending) removePendingRow(pending);
                         if (onEach) onEach(j, action);
                         return j;
@@ -616,12 +669,18 @@ $isEdit = isset($program) && $programId > 0;
                 coverUploading.classList.remove('hidden');
                 coverUploading.classList.add('flex', 'flex-col');
             }
+            var pctEl = document.getElementById('program-cover-pct');
+            var pctBar = document.getElementById('program-cover-pct-bar');
+            function setCoverPct(pct) {
+                if (pctEl) pctEl.textContent = (typeof pct === 'number' ? pct : 0) + '%';
+                if (pctBar) pctBar.style.width = (typeof pct === 'number' ? pct : 0) + '%';
+            }
+            setCoverPct(0);
             var fd = new FormData();
             fd.append('program_id', String(PROGRAM_ID));
             fd.append('file', file);
-            var url = ADMIN_API + '?action=program_cover_upload&program_id=' + encodeURIComponent(String(PROGRAM_ID));
-            fetch(url, { method: 'POST', body: fd, credentials: 'same-origin' })
-                .then(parseJsonResponse)
+            var coverUrl = ADMIN_API + '?action=program_cover_upload&program_id=' + encodeURIComponent(String(PROGRAM_ID));
+            xhrUploadWithJson(coverUrl, fd, setCoverPct)
                 .then(function (j) {
                     if (localUrl) {
                         try { URL.revokeObjectURL(localUrl); } catch (e2) {}
@@ -646,6 +705,7 @@ $isEdit = isset($program) && $programId > 0;
                         coverUploading.classList.add('hidden');
                         coverUploading.classList.remove('flex', 'flex-col');
                     }
+                    setCoverPct(0);
                     var prevPath = coverPathField && coverPathField.value ? coverPathField.value.trim() : '';
                     if (coverPreviewImg) {
                         if (prevPath) {
