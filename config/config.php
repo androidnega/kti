@@ -4,6 +4,8 @@
 define('APP_NAME', 'Kikam Technical Institute');
 define('APP_URL', 'https://kikamtech.org');
 define('ADMIN_URL', 'https://kikamtech.org/admin');
+/** POST/XHR entry (avoids /admin → /admin/ redirects that drop multipart bodies on some hosts) */
+define('ADMIN_INDEX_URL', rtrim(ADMIN_URL, '/') . '/index.php');
 
 // YouTube (@KikamTechnicalInstitute) — RSS shows latest uploads; set API key for full channel list via Data API v3
 define('YOUTUBE_CHANNEL_ID', 'UCA4fazj3TsAZelogMi8MS7w');
@@ -33,8 +35,8 @@ define('UPLOAD_PATH', STORAGE_PATH . '/uploads');
 /** Web-accessible program images/videos (under public/) */
 define('PROGRAM_UPLOAD_PATH', PUBLIC_PATH . '/uploads/programs');
 define('PROGRAM_VIDEO_PATH', PUBLIC_PATH . '/uploads/videos');
-/** Max JPEG output size for program gallery images (bytes) */
-define('PROGRAM_IMAGE_MAX_BYTES', 256000);
+/** Max JPEG output size for program gallery images (bytes; strict “under 250 KB” as 250×1000) */
+define('PROGRAM_IMAGE_MAX_BYTES', 250000);
 
 // Session Configuration
 define('SESSION_LIFETIME', 3600); // 1 hour

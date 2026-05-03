@@ -51,7 +51,7 @@ $isEdit = isset($program) && $programId > 0;
                 <p class="mt-1 text-xs text-slate-500 sm:text-sm">Name, faculty, and text shown on listing and detail pages.</p>
             </div>
             <div class="p-4 sm:p-6">
-                <form id="program-main-form" method="POST" action="<?= ADMIN_URL ?>?action=program_save" class="space-y-5 sm:space-y-6">
+                <form id="program-main-form" method="POST" action="<?= htmlspecialchars(ADMIN_INDEX_URL) ?>?action=program_save" class="space-y-5 sm:space-y-6">
                     <?php if ($isEdit): ?>
                     <input type="hidden" name="id" value="<?= (int) $program['id'] ?>">
                     <?php endif; ?>
@@ -239,6 +239,7 @@ $isEdit = isset($program) && $programId > 0;
 <script>
 (function () {
     var ADMIN_URL = <?= json_encode(ADMIN_URL) ?>;
+    var ADMIN_API = <?= json_encode(ADMIN_INDEX_URL) ?>;
     var PROGRAM_ID = <?= (int) $programId ?>;
 
     var toastEl = document.getElementById('admin-toast');
@@ -319,7 +320,7 @@ $isEdit = isset($program) && $programId > 0;
             e.preventDefault();
             var fd = new FormData(urlForm);
             fd.append('program_id', String(PROGRAM_ID));
-            fetch(ADMIN_URL + '?action=program_video_url_save', { method: 'POST', body: fd, credentials: 'same-origin' })
+            fetch(ADMIN_API + '?action=program_video_url_save&program_id=' + encodeURIComponent(String(PROGRAM_ID)), { method: 'POST', body: fd, credentials: 'same-origin' })
                 .then(function (r) { return r.json(); })
                 .then(function (j) {
                     if (!j.ok) throw new Error(j.error || 'Failed');
@@ -338,7 +339,7 @@ $isEdit = isset($program) && $programId > 0;
             onEnd: function () {
                 var ids = [];
                 list.querySelectorAll('.media-row').forEach(function (el) { ids.push(parseInt(el.getAttribute('data-id'), 10)); });
-                fetch(ADMIN_URL + '?action=program_media_reorder', {
+                fetch(ADMIN_API + '?action=program_media_reorder', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ ids: ids }),
@@ -362,7 +363,7 @@ $isEdit = isset($program) && $programId > 0;
             var fd = new FormData();
             fd.append('id', id);
             fd.append('caption', cap ? cap.value : '');
-            fetch(ADMIN_URL + '?action=program_media_caption_save', { method: 'POST', body: fd, credentials: 'same-origin' })
+            fetch(ADMIN_API + '?action=program_media_caption_save', { method: 'POST', body: fd, credentials: 'same-origin' })
                 .then(function (r) { return r.json(); })
                 .then(function (j) {
                     if (!j.ok) throw new Error(j.error || 'Save failed');

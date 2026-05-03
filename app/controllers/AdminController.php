@@ -157,7 +157,7 @@ class AdminController extends BaseController {
     }
 
     public function programMediaUpload() {
-        $programId = (int) ($_POST['program_id'] ?? 0);
+        $programId = (int) ($_POST['program_id'] ?? $_GET['program_id'] ?? 0);
         if ($programId < 1 || !$this->programModel->find($programId)) {
             $this->json(['ok' => false, 'error' => 'Invalid program'], 400);
         }
@@ -206,7 +206,7 @@ class AdminController extends BaseController {
     }
 
     public function programVideoUpload() {
-        $programId = (int) ($_POST['program_id'] ?? 0);
+        $programId = (int) ($_POST['program_id'] ?? $_GET['program_id'] ?? 0);
         if ($programId < 1 || !$this->programModel->find($programId)) {
             $this->json(['ok' => false, 'error' => 'Invalid program'], 400);
         }
@@ -255,7 +255,7 @@ class AdminController extends BaseController {
     }
 
     public function programVideoUrlSave() {
-        $programId = (int) ($_POST['program_id'] ?? 0);
+        $programId = (int) ($_POST['program_id'] ?? $_GET['program_id'] ?? 0);
         $url = trim((string) ($_POST['external_url'] ?? ''));
         if ($programId < 1 || !$this->programModel->find($programId)) {
             $this->json(['ok' => false, 'error' => 'Invalid program'], 400);
