@@ -1,113 +1,180 @@
 <?php ob_start(); ?>
 <?php
+$program = is_array($program ?? null) ? $program : [];
 $faculties = ['Engineering', 'Construction', 'Technology', 'Automotive', 'General'];
 $programId = isset($program['id']) ? (int) $program['id'] : 0;
 $media = $media ?? [];
+$slug = trim((string) ($program['slug'] ?? ''));
+$publicUrl = $slug !== '' ? (rtrim(APP_URL, '/') . '/?url=program/' . rawurlencode($slug)) : '';
+$isEdit = isset($program) && $programId > 0;
 ?>
 
-<div class="mb-6">
-    <a href="<?= ADMIN_URL ?>?action=programs" class="inline-flex items-center text-sm text-primary-600 hover:text-primary-800">
-        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-        Back to Programs
-    </a>
-    <h1 class="text-2xl font-bold text-gray-900 mt-3"><?= isset($program) ? 'Edit Program' : 'Add Program' ?></h1>
-    <p class="mt-1 text-sm text-gray-500">Describe each academic or technical program clearly for prospective students.</p>
+<!-- Toast -->
+<div id="admin-toast" class="pointer-events-none fixed bottom-6 left-1/2 z-[100] hidden max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-800 shadow-lg sm:left-auto sm:right-6 sm:translate-x-0" role="status"></div>
+
+<div class="mb-6 sm:mb-8">
+    <nav class="flex flex-wrap items-center gap-2 text-xs font-medium text-slate-500 sm:text-sm">
+        <a href="<?= ADMIN_URL ?>?action=programs" class="inline-flex items-center gap-1.5 rounded-lg text-primary-700 hover:text-primary-900 hover:underline">
+            <i class="fa-solid fa-arrow-left text-[10px] sm:text-xs"></i>
+            Programs
+        </a>
+        <span class="text-slate-300" aria-hidden="true">/</span>
+        <span class="text-slate-700"><?= $isEdit ? 'Edit department' : 'New program' ?></span>
+    </nav>
+    <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div class="min-w-0">
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl"><?= $isEdit ? 'Edit program' : 'Add program' ?></h1>
+            <p class="mt-1 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base">
+                <?= $isEdit ? 'Update how this department appears on the site, gallery, and detail page.' : 'Create a program visitors can open from the Programs page.' ?>
+            </p>
+            <?php if ($isEdit && $slug !== ''): ?>
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-slate-200/80 px-3 py-1 font-mono text-[11px] text-slate-700 sm:text-xs"><?= htmlspecialchars($slug) ?></span>
+                <a href="<?= htmlspecialchars($publicUrl) ?>" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-primary-700 shadow-sm hover:border-primary-300 hover:bg-primary-50">
+                    <i class="fa-solid fa-external-link-alt text-[10px]"></i>
+                    Open public page
+                </a>
+            </div>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
 
-<div class="card max-w-4xl">
-    <form method="POST" action="<?= ADMIN_URL ?>?action=program_save" class="space-y-6">
-        <?php if (isset($program)): ?>
-        <input type="hidden" name="id" value="<?= (int) $program['id'] ?>">
+<div class="grid gap-6 lg:grid-cols-3 lg:gap-8">
+    <div class="space-y-6 lg:col-span-2">
+        <section class="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+            <div class="border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-4 py-4 sm:px-6">
+                <h2 class="flex items-center gap-2 text-base font-semibold text-slate-900">
+                    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-900 text-accent-400"><i class="fa-solid fa-pen-to-square text-sm"></i></span>
+                    Basics
+                </h2>
+                <p class="mt-1 text-xs text-slate-500 sm:text-sm">Name, faculty, and text shown on listing and detail pages.</p>
+            </div>
+            <div class="p-4 sm:p-6">
+                <form id="program-main-form" method="POST" action="<?= ADMIN_URL ?>?action=program_save" class="space-y-5 sm:space-y-6">
+                    <?php if ($isEdit): ?>
+                    <input type="hidden" name="id" value="<?= (int) $program['id'] ?>">
+                    <?php endif; ?>
+
+                    <div class="grid gap-4 sm:grid-cols-2 sm:gap-5">
+                        <div class="sm:col-span-2">
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 sm:text-sm sm:normal-case sm:tracking-normal">Program name <span class="text-red-500">*</span></label>
+                            <input type="text" name="name" required class="input w-full rounded-xl border-slate-200 px-4 py-3 text-base shadow-sm focus:border-primary-500 focus:ring-primary-500" value="<?= htmlspecialchars($program['name'] ?? '') ?>" placeholder="e.g. Mechanical Engineering" autocomplete="organization">
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 sm:text-sm sm:normal-case sm:tracking-normal">URL slug</label>
+                            <input type="text" name="slug" class="input w-full rounded-xl border-slate-200 px-4 py-3 font-mono text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" value="<?= htmlspecialchars($program['slug'] ?? '') ?>" placeholder="auto-from-name" inputmode="url" autocapitalize="none" spellcheck="false">
+                            <p class="mt-1.5 text-xs text-slate-500">Lowercase, hyphens. Blank = generated from the name.</p>
+                        </div>
+                        <div>
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 sm:text-sm sm:normal-case sm:tracking-normal">Faculty</label>
+                            <select name="faculty" class="input w-full rounded-xl border-slate-200 bg-white px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500">
+                                <option value="">Choose faculty…</option>
+                                <?php foreach ($faculties as $f): ?>
+                                <option value="<?= htmlspecialchars($f) ?>" <?= (($program['faculty'] ?? '') === $f) ? 'selected' : '' ?>><?= htmlspecialchars($f) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 sm:text-sm sm:normal-case sm:tracking-normal">Department label</label>
+                            <input type="text" name="department" class="input w-full rounded-xl border-slate-200 px-4 py-3 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" value="<?= htmlspecialchars($program['department'] ?? '') ?>" placeholder="Shown with the program on the site">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 sm:text-sm sm:normal-case sm:tracking-normal">Cover image path</label>
+                            <input type="text" name="cover_image" class="input w-full rounded-xl border-slate-200 px-4 py-3 font-mono text-xs shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm" value="<?= htmlspecialchars($program['cover_image'] ?? '') ?>" placeholder="uploads/programs/your-slug/photo.jpg">
+                            <p class="mt-1.5 text-xs text-slate-500">Usually set automatically from the gallery. Relative to site root.</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 sm:text-sm sm:normal-case sm:tracking-normal">Short description</label>
+                        <textarea name="description" rows="4" class="input w-full resize-y rounded-xl border-slate-200 px-4 py-3 text-sm leading-relaxed shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:min-h-[120px]" placeholder="Summary for cards and headers"><?= htmlspecialchars($program['description'] ?? '') ?></textarea>
+                    </div>
+                    <div>
+                        <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 sm:text-sm sm:normal-case sm:tracking-normal">Detail page content</label>
+                        <textarea name="detail_content" rows="8" class="input w-full resize-y rounded-xl border-slate-200 px-4 py-3 text-sm leading-relaxed shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:min-h-[200px]" placeholder="Extra paragraphs on the department detail page (plain text)"><?= htmlspecialchars($program['detail_content'] ?? '') ?></textarea>
+                    </div>
+
+                    <div class="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                        <a href="<?= ADMIN_URL ?>?action=programs" class="inline-flex justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">Cancel</a>
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-900 px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-black focus:outline-none focus:ring-2 focus:ring-accent-400 focus:ring-offset-2">
+                            <i class="fa-solid fa-check text-accent-400"></i>
+                            <?= $isEdit ? 'Save changes' : 'Create program' ?>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <aside class="space-y-4 lg:col-span-1">
+        <div class="rounded-2xl border border-amber-200/80 bg-amber-50/90 p-4 text-sm text-amber-950 shadow-sm">
+            <p class="flex items-start gap-2 font-semibold text-amber-900">
+                <i class="fa-solid fa-lightbulb mt-0.5 text-amber-600"></i>
+                Tips
+            </p>
+            <ul class="mt-2 list-inside list-disc space-y-1.5 text-xs leading-relaxed text-amber-900/90 sm:text-sm">
+                <li>Save basics first, then add photos and videos below.</li>
+                <li>First gallery image can be used as the card cover (“Set cover”).</li>
+                <li>Large MP4 uploads may need a higher PHP <code class="rounded bg-amber-100/80 px-1">upload_max_filesize</code>.</li>
+            </ul>
+        </div>
+        <?php if ($isEdit && $publicUrl): ?>
+        <a href="<?= htmlspecialchars($publicUrl) ?>" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm font-semibold text-primary-800 shadow-sm transition hover:border-primary-300 hover:bg-primary-50">
+            <i class="fa-solid fa-eye text-accent-600"></i>
+            Preview on website
+        </a>
         <?php endif; ?>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label class="label">Program Name</label>
-                <input type="text" name="name" required class="input" value="<?= htmlspecialchars($program['name'] ?? '') ?>" placeholder="Mechanical Engineering">
-            </div>
-            <div>
-                <label class="label">URL slug</label>
-                <input type="text" name="slug" class="input font-mono text-sm" value="<?= htmlspecialchars($program['slug'] ?? '') ?>" placeholder="mechanical-engineering">
-                <p class="mt-1 text-xs text-gray-500">Leave blank to generate from the program name. Must be unique.</p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label class="label">Faculty</label>
-                <select name="faculty" class="input">
-                    <option value="">— Select —</option>
-                    <?php foreach ($faculties as $f): ?>
-                    <option value="<?= htmlspecialchars($f) ?>" <?= (($program['faculty'] ?? '') === $f) ? 'selected' : '' ?>><?= htmlspecialchars($f) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div>
-                <label class="label">Department</label>
-                <input type="text" name="department" class="input" value="<?= htmlspecialchars($program['department'] ?? '') ?>" placeholder="Department name">
-            </div>
-        </div>
-
-        <div>
-            <label class="label">Cover image path</label>
-            <input type="text" name="cover_image" class="input font-mono text-sm" value="<?= htmlspecialchars($program['cover_image'] ?? '') ?>" placeholder="uploads/programs/example.jpg">
-            <p class="mt-1 text-xs text-gray-500">Relative to the site root (e.g. <code class="text-xs">uploads/programs/…</code>) or set from gallery “Set cover”.</p>
-        </div>
-
-        <div>
-            <label class="label">Description</label>
-            <textarea name="description" rows="5" class="input text-sm leading-relaxed" placeholder="Short summary for listings and hero"><?= htmlspecialchars($program['description'] ?? '') ?></textarea>
-        </div>
-
-        <div>
-            <label class="label">Detail content</label>
-            <textarea name="detail_content" rows="10" class="input text-sm leading-relaxed" placeholder="Longer text for the program detail page"><?= htmlspecialchars($program['detail_content'] ?? '') ?></textarea>
-        </div>
-
-        <div class="flex flex-wrap gap-3">
-            <button type="submit" class="btn btn-primary">
-                <?= isset($program) ? 'Update Program' : 'Add Program' ?>
-            </button>
-            <a href="<?= ADMIN_URL ?>?action=programs" class="btn btn-secondary">Cancel</a>
-        </div>
-    </form>
+    </aside>
 </div>
 
 <?php if ($programId > 0): ?>
-<div class="card max-w-4xl mt-8 space-y-8">
-    <div>
-        <h2 class="text-lg font-semibold text-gray-900">Gallery images</h2>
-        <p class="text-sm text-gray-500 mt-1">Drop image files here (JPEG, PNG, etc.). Files are converted to JPEG.</p>
-        <div id="drop-images" class="mt-3 flex min-h-[140px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-sm text-gray-600 hover:border-primary-400 hover:bg-primary-50/30 transition-colors">
-            <i class="fa-solid fa-image text-2xl text-primary-500 mb-2"></i>
-            <span>Drag and drop images here or click to choose files</span>
-            <input type="file" id="file-images" class="hidden" accept="image/*" multiple>
-        </div>
+<section class="mt-8 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm sm:mt-10">
+    <div class="border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white px-4 py-4 sm:px-6">
+        <h2 class="flex items-center gap-2 text-base font-semibold text-slate-900">
+            <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-900 text-accent-400"><i class="fa-solid fa-photo-film text-sm"></i></span>
+            Media library
+        </h2>
+        <p class="mt-1 text-xs text-slate-500 sm:text-sm">Uploads go to <code class="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[11px] text-slate-700">public/uploads/programs/<?= htmlspecialchars($slug ?: '…') ?>/</code></p>
     </div>
 
-    <div>
-        <h2 class="text-lg font-semibold text-gray-900">Videos (MP4)</h2>
-        <p class="text-sm text-gray-500 mt-1">Upload MP4 files or add a YouTube / external URL below.</p>
-        <div id="drop-videos" class="mt-3 flex min-h-[120px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-sm text-gray-600 hover:border-primary-400 hover:bg-primary-50/30 transition-colors">
-            <i class="fa-solid fa-film text-2xl text-primary-500 mb-2"></i>
-            <span>Drag and drop MP4 here or click to choose</span>
-            <input type="file" id="file-videos" class="hidden" accept="video/mp4,.mp4" multiple>
-        </div>
-        <form id="form-video-url" class="mt-4 flex flex-col sm:flex-row gap-2 sm:items-end">
-            <div class="flex-1">
-                <label class="label mb-1">External video URL</label>
-                <input type="url" name="external_url" class="input text-sm" placeholder="https://www.youtube.com/watch?v=…">
+    <div class="grid gap-8 p-4 sm:p-6 lg:grid-cols-2 lg:gap-10">
+        <div>
+            <h3 class="text-sm font-bold text-slate-800">Images</h3>
+            <p class="mt-1 text-xs text-slate-500 sm:text-sm">JPEG, PNG, WebP, or GIF — stored as optimized JPEG.</p>
+            <div id="drop-images" role="button" tabindex="0" aria-label="Upload images" class="mt-3 flex min-h-[min(12rem,40vh)] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/80 px-4 py-10 text-center transition hover:border-primary-400 hover:bg-primary-50/50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 active:scale-[0.99] sm:min-h-[11rem]">
+                <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-900 text-2xl text-accent-400 shadow-inner"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+                <span class="max-w-xs text-sm font-medium text-slate-700">Drop images here or <span class="text-primary-700 underline decoration-2 underline-offset-2">tap to browse</span></span>
+                <span class="text-xs text-slate-500">Multiple files supported</span>
+                <input type="file" id="file-images" class="sr-only" accept="image/*" multiple>
             </div>
-            <button type="submit" class="btn btn-secondary whitespace-nowrap">Add URL</button>
-        </form>
+        </div>
+        <div>
+            <h3 class="text-sm font-bold text-slate-800">Videos</h3>
+            <p class="mt-1 text-xs text-slate-500 sm:text-sm">MP4 upload or paste a YouTube link.</p>
+            <div id="drop-videos" role="button" tabindex="0" aria-label="Upload videos" class="mt-3 flex min-h-[min(11rem,36vh)] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/80 px-4 py-8 text-center transition hover:border-primary-400 hover:bg-primary-50/50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 active:scale-[0.99] sm:min-h-[10rem]">
+                <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-800 text-2xl text-white shadow-inner"><i class="fa-solid fa-clapperboard"></i></span>
+                <span class="max-w-xs text-sm font-medium text-slate-700">Drop MP4 here or <span class="text-primary-700 underline decoration-2 underline-offset-2">tap to choose</span></span>
+                <input type="file" id="file-videos" class="sr-only" accept="video/mp4,.mp4" multiple>
+            </div>
+            <form id="form-video-url" class="mt-5 space-y-2 rounded-xl border border-slate-100 bg-slate-50/80 p-4">
+                <label class="text-xs font-semibold uppercase tracking-wide text-slate-600">YouTube or video URL</label>
+                <div class="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+                    <input type="url" name="external_url" class="input min-h-[44px] flex-1 rounded-xl border-slate-200 px-3 py-2.5 text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500" placeholder="https://www.youtube.com/watch?v=…">
+                    <button type="submit" class="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-xl bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:ring-offset-2">Add link</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div>
-        <h2 class="text-lg font-semibold text-gray-900 mb-2">Media order</h2>
-        <p class="text-sm text-gray-500 mb-3">Drag rows to reorder. Order is saved automatically.</p>
-        <ul id="media-sortable" class="space-y-2">
+    <div class="border-t border-slate-100 px-4 py-5 sm:px-6 sm:py-6">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+                <h3 class="text-sm font-bold text-slate-800">Gallery order</h3>
+                <p class="text-xs text-slate-500 sm:text-sm">Drag <i class="fa-solid fa-grip-vertical text-slate-400"></i> to reorder. Saves automatically.</p>
+            </div>
+        </div>
+        <ul id="media-sortable" class="mt-4 space-y-3">
             <?php foreach ($media as $m): ?>
             <?php
             $isVideo = ($m['media_type'] ?? '') === 'video';
@@ -116,38 +183,55 @@ $media = $media ?? [];
                 $thumb = rtrim(APP_URL, '/') . '/' . ltrim($m['file_path'], '/');
             }
             ?>
-            <li class="media-row flex flex-wrap items-start gap-3 rounded-lg border border-gray-200 bg-white p-3" data-id="<?= (int) $m['id'] ?>">
-                <span class="drag-handle cursor-grab active:cursor-grabbing text-gray-400 pt-2 select-none" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span>
-                <div class="h-16 w-24 flex-shrink-0 overflow-hidden rounded-md bg-gray-100 border border-gray-100 flex items-center justify-center">
-                    <?php if ($isVideo): ?>
-                    <span class="text-xs font-semibold uppercase text-primary-700"><i class="fa-solid fa-video mr-1"></i>Video</span>
-                    <?php elseif ($thumb): ?>
-                    <img src="<?= htmlspecialchars($thumb) ?>" alt="" class="h-full w-full object-cover">
-                    <?php else: ?>
-                    <span class="text-xs text-gray-400">—</span>
-                    <?php endif; ?>
-                </div>
-                <div class="flex-1 min-w-[200px] space-y-2">
-                    <form class="caption-form flex gap-2 items-end" data-media-id="<?= (int) $m['id'] ?>">
-                        <div class="flex-1">
-                            <label class="text-xs text-gray-500">Caption</label>
-                            <input type="text" name="caption" class="input text-sm py-1.5" value="<?= htmlspecialchars($m['caption'] ?? '') ?>" placeholder="Optional caption">
+            <li class="media-row group rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300 hover:shadow-md sm:p-4" data-id="<?= (int) $m['id'] ?>">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-stretch">
+                    <div class="flex shrink-0 items-center gap-2 sm:flex-col sm:items-center sm:pt-1">
+                        <span class="drag-handle flex h-11 w-11 cursor-grab select-none items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 active:cursor-grabbing hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span>
+                    </div>
+                    <div class="relative h-40 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-24 sm:w-36 sm:flex-shrink-0">
+                        <?php if ($isVideo): ?>
+                        <div class="flex h-full w-full flex-col items-center justify-center gap-1 bg-slate-900/90 text-white">
+                            <i class="fa-solid fa-circle-play text-3xl text-accent-400"></i>
+                            <span class="text-xs font-bold uppercase tracking-wide">Video</span>
                         </div>
-                        <button type="submit" class="text-xs font-medium text-primary-600 hover:text-primary-800 px-2 py-1.5">Save</button>
-                    </form>
-                    <div class="flex flex-wrap gap-3 text-xs">
-                        <?php if (!$isVideo && !empty($m['file_path'])): ?>
-                        <a href="<?= ADMIN_URL ?>?action=program_media_set_cover&id=<?= (int) $m['id'] ?>" class="font-medium text-accent-700 hover:text-accent-900">Set cover</a>
+                        <?php elseif ($thumb): ?>
+                        <img src="<?= htmlspecialchars($thumb) ?>" alt="" class="h-full w-full object-cover" loading="lazy" width="144" height="96">
+                        <?php else: ?>
+                        <div class="flex h-full items-center justify-center text-xs text-slate-400">No preview</div>
                         <?php endif; ?>
-                        <a href="<?= ADMIN_URL ?>?action=program_media_delete&id=<?= (int) $m['id'] ?>" class="font-medium text-red-600 hover:text-red-800" onclick="return confirm('Delete this media item?');">Delete</a>
+                    </div>
+                    <div class="min-w-0 flex-1 space-y-3">
+                        <form class="caption-form space-y-2" data-media-id="<?= (int) $m['id'] ?>">
+                            <label class="text-xs font-medium text-slate-600">Caption</label>
+                            <div class="flex flex-col gap-2 sm:flex-row sm:items-end">
+                                <input type="text" name="caption" class="input min-h-[44px] flex-1 rounded-xl border-slate-200 px-3 py-2.5 text-sm shadow-sm" value="<?= htmlspecialchars($m['caption'] ?? '') ?>" placeholder="Optional label">
+                                <button type="submit" class="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-primary-800 hover:bg-slate-50">Save</button>
+                            </div>
+                        </form>
+                        <div class="flex flex-wrap gap-2 border-t border-slate-100 pt-3">
+                            <?php if (!$isVideo && !empty($m['file_path'])): ?>
+                            <a href="<?= ADMIN_URL ?>?action=program_media_set_cover&id=<?= (int) $m['id'] ?>" class="inline-flex items-center gap-1.5 rounded-lg bg-accent-100 px-3 py-2 text-xs font-bold text-amber-950 hover:bg-accent-200"><i class="fa-regular fa-image"></i> Set as cover</a>
+                            <?php endif; ?>
+                            <a href="<?= ADMIN_URL ?>?action=program_media_delete&id=<?= (int) $m['id'] ?>" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800 hover:bg-red-100" onclick="return confirm('Delete this item?');"><i class="fa-regular fa-trash-can"></i> Delete</a>
+                        </div>
                     </div>
                 </div>
             </li>
             <?php endforeach; ?>
         </ul>
         <?php if (empty($media)): ?>
-        <p class="text-sm text-gray-500 mt-2" id="media-empty-hint">No media yet. Upload images or videos above.</p>
+        <p class="mt-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-sm text-slate-500" id="media-empty-hint">No media yet. Use the zones above to add images or videos.</p>
         <?php endif; ?>
+    </div>
+</section>
+
+<!-- Mobile sticky save (mirrors main form submit) -->
+<div class="pointer-events-none fixed inset-x-0 bottom-0 z-30 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] lg:hidden">
+    <div class="pointer-events-auto flex justify-end">
+        <button type="button" id="program-mobile-save" class="inline-flex items-center gap-2 rounded-full bg-primary-900 px-5 py-3 text-sm font-bold text-white shadow-lg ring-1 ring-black/10 hover:bg-black focus:outline-none focus:ring-2 focus:ring-accent-400 focus:ring-offset-2">
+            <i class="fa-solid fa-floppy-disk text-accent-400"></i>
+            Save
+        </button>
     </div>
 </div>
 
@@ -157,8 +241,32 @@ $media = $media ?? [];
     var ADMIN_URL = <?= json_encode(ADMIN_URL) ?>;
     var PROGRAM_ID = <?= (int) $programId ?>;
 
+    var toastEl = document.getElementById('admin-toast');
+    function showToast(msg, isError) {
+        if (!toastEl) { if (isError) alert(msg); return; }
+        toastEl.textContent = msg;
+        toastEl.classList.remove('hidden', 'border-red-200', 'bg-red-50', 'text-red-900');
+        if (isError) {
+            toastEl.classList.add('border-red-200', 'bg-red-50', 'text-red-900');
+        } else {
+            toastEl.classList.add('border-slate-200', 'bg-white', 'text-slate-800');
+        }
+        toastEl.classList.remove('hidden');
+        clearTimeout(showToast._t);
+        showToast._t = setTimeout(function () { toastEl.classList.add('hidden'); }, 4200);
+    }
+
+    var mainForm = document.getElementById('program-main-form');
+    var mobileSave = document.getElementById('program-mobile-save');
+    if (mainForm && mobileSave) {
+        mobileSave.addEventListener('click', function () {
+            if (mainForm.requestSubmit) mainForm.requestSubmit();
+            else mainForm.submit();
+        });
+    }
+
     function uploadFiles(action, files) {
-        if (!files || !files.length) return;
+        if (!files || !files.length) return Promise.resolve();
         var i, fd, p = Promise.resolve();
         function one(file) {
             fd = new FormData();
@@ -180,19 +288,25 @@ $media = $media ?? [];
         var zone = document.getElementById(zoneId);
         var input = document.getElementById(inputId);
         if (!zone || !input) return;
-        zone.addEventListener('click', function () { input.click(); });
+        function pick() { input.click(); }
+        zone.addEventListener('click', pick);
+        zone.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); }
+        });
         ['dragenter', 'dragover'].forEach(function (ev) {
-            zone.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); zone.classList.add('border-primary-500', 'bg-primary-50'); });
+            zone.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); zone.classList.add('border-primary-500', 'bg-primary-50', 'ring-2', 'ring-primary-200'); });
         });
         ['dragleave', 'drop'].forEach(function (ev) {
-            zone.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); zone.classList.remove('border-primary-500', 'bg-primary-50'); });
+            zone.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); zone.classList.remove('border-primary-500', 'bg-primary-50', 'ring-2', 'ring-primary-200'); });
         });
         zone.addEventListener('drop', function (e) {
             var files = e.dataTransfer.files;
-            uploadFiles(action, files).then(function () { window.location.reload(); }).catch(function (err) { alert(err.message || String(err)); });
+            showToast('Uploading…');
+            uploadFiles(action, files).then(function () { showToast('Upload complete'); window.location.reload(); }).catch(function (err) { showToast(err.message || String(err), true); });
         });
         input.addEventListener('change', function () {
-            uploadFiles(action, input.files).then(function () { window.location.reload(); }).catch(function (err) { alert(err.message || String(err)); });
+            showToast('Uploading…');
+            uploadFiles(action, input.files).then(function () { showToast('Upload complete'); window.location.reload(); }).catch(function (err) { showToast(err.message || String(err), true); });
         });
     }
 
@@ -209,16 +323,17 @@ $media = $media ?? [];
                 .then(function (r) { return r.json(); })
                 .then(function (j) {
                     if (!j.ok) throw new Error(j.error || 'Failed');
+                    showToast('Video link added');
                     window.location.reload();
                 })
-                .catch(function (err) { alert(err.message || String(err)); });
+                .catch(function (err) { showToast(err.message || String(err), true); });
         });
     }
 
     var list = document.getElementById('media-sortable');
     if (list && typeof Sortable !== 'undefined') {
         Sortable.create(list, {
-            animation: 150,
+            animation: 180,
             handle: '.drag-handle',
             onEnd: function () {
                 var ids = [];
@@ -230,8 +345,11 @@ $media = $media ?? [];
                     credentials: 'same-origin'
                 })
                     .then(function (r) { return r.json(); })
-                    .then(function (j) { if (!j.ok) throw new Error(j.error || 'Reorder failed'); })
-                    .catch(function (err) { alert(err.message || String(err)); });
+                    .then(function (j) {
+                        if (!j.ok) throw new Error(j.error || 'Reorder failed');
+                        showToast('Order saved');
+                    })
+                    .catch(function (err) { showToast(err.message || String(err), true); });
             }
         });
     }
@@ -246,8 +364,11 @@ $media = $media ?? [];
             fd.append('caption', cap ? cap.value : '');
             fetch(ADMIN_URL + '?action=program_media_caption_save', { method: 'POST', body: fd, credentials: 'same-origin' })
                 .then(function (r) { return r.json(); })
-                .then(function (j) { if (!j.ok) throw new Error(j.error || 'Save failed'); })
-                .catch(function (err) { alert(err.message || String(err)); });
+                .then(function (j) {
+                    if (!j.ok) throw new Error(j.error || 'Save failed');
+                    showToast('Caption saved');
+                })
+                .catch(function (err) { showToast(err.message || String(err), true); });
         });
     });
 })();
