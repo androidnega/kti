@@ -45,20 +45,20 @@
                 @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition;
             }
             .btn-primary {
-                @apply bg-primary-900 text-white hover:bg-black shadow-sm;
+                @apply bg-primary-900 text-white hover:bg-black;
             }
             .btn-secondary {
                 @apply bg-slate-200 text-slate-800 hover:bg-slate-300;
             }
             .card {
-                @apply rounded-xl border border-slate-200 bg-white p-6 shadow-sm;
+                @apply rounded-xl border border-slate-200 bg-white p-6;
             }
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-900 antialiased">
+<body class="flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden bg-slate-50 text-slate-900 antialiased">
     <!-- Mobile top bar -->
-    <header class="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-slate-800 bg-primary-900 px-4 py-3 text-white lg:hidden">
+    <header class="z-40 flex shrink-0 items-center justify-between gap-3 border-b border-slate-800 bg-primary-900 px-4 py-3 text-white lg:hidden">
         <button type="button" id="admin-sidebar-open" class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-accent-400" aria-controls="admin-sidebar" aria-expanded="false" aria-label="Open menu">
             <i class="fa-solid fa-bars text-lg"></i>
         </button>
@@ -67,11 +67,11 @@
     </header>
 
     <!-- Backdrop when mobile menu open -->
-    <div id="admin-sidebar-backdrop" class="fixed inset-0 z-40 hidden bg-black/50 backdrop-blur-sm lg:hidden" aria-hidden="true"></div>
+    <div id="admin-sidebar-backdrop" class="fixed inset-0 z-40 hidden bg-black/40 lg:hidden" aria-hidden="true"></div>
 
-    <div class="flex min-h-[100dvh] min-h-screen">
-        <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-50 flex w-[min(100vw,18rem)] -translate-x-full flex-col border-r border-slate-800 bg-primary-900 text-white shadow-xl transition-transform duration-200 ease-out lg:static lg:z-0 lg:w-64 lg:translate-x-0 lg:shadow-none" aria-label="Admin navigation">
-            <div class="flex items-center gap-3 border-b border-white/10 p-5">
+    <div class="flex min-h-0 flex-1 overflow-hidden lg:flex-row">
+        <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-50 flex w-[min(100vw,18rem)] -translate-x-full flex-col border-r border-slate-800 bg-primary-900 text-white transition-transform duration-200 ease-out lg:static lg:z-0 lg:h-full lg:w-64 lg:min-h-0 lg:translate-x-0 lg:flex-shrink-0" aria-label="Admin navigation">
+            <div class="flex shrink-0 items-center gap-3 border-b border-white/10 p-5">
                 <img src="<?= APP_URL ?>/assets/images/logo.png" alt="" class="h-9 w-auto object-contain" width="36" height="36">
                 <div class="min-w-0">
                     <p class="truncate text-lg font-bold leading-tight">KTI Admin</p>
@@ -81,7 +81,7 @@
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <nav class="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
+            <nav class="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain px-3 py-4">
                 <?php
                 $a = $_GET['action'] ?? 'dashboard';
                 $nav = function ($href, $label, $icon, $active) {
@@ -98,7 +98,7 @@
                 $nav(ADMIN_URL . '?action=programs', 'Programs', '<i class="fa-solid fa-graduation-cap text-sm"></i>', in_array($a, ['programs', 'program_create', 'program_edit', 'program_media_upload', 'program_video_upload', 'program_video_url_save', 'program_media_reorder', 'program_media_delete', 'program_media_set_cover', 'program_media_caption_save'], true));
                 ?>
             </nav>
-            <div class="border-t border-white/10 p-4">
+            <div class="shrink-0 border-t border-white/10 p-4">
                 <a href="<?= APP_URL ?>" target="_blank" rel="noopener" class="mb-2 flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm text-primary-200 hover:bg-white/5 hover:text-white">
                     <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-70"></i>
                     View website
@@ -110,7 +110,7 @@
             </div>
         </aside>
 
-        <main class="min-w-0 flex-1 lg:overflow-y-auto">
+        <main class="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-y-contain bg-slate-50">
             <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
                 <?= $content ?? '' ?>
             </div>

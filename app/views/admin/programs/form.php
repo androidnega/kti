@@ -25,7 +25,7 @@ $isEdit = isset($program) && $programId > 0;
         <div class="min-w-0">
             <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl"><?= $isEdit ? 'Edit program' : 'Add program' ?></h1>
             <p class="mt-1 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base">
-                <?= $isEdit ? 'Update how this department appears on the site, gallery, and detail page.' : 'Create a program visitors can open from the Programs page.' ?>
+                <?= $isEdit ? 'Update how this department appears on the site, gallery, and detail page.' : 'Create a program visitors can open from the Programs page. After you save once, gallery uploads apply immediately—you can add photos before filling every field.' ?>
             </p>
             <?php if ($isEdit && $slug !== ''): ?>
             <div class="mt-3 flex flex-wrap items-center gap-2">
@@ -114,7 +114,7 @@ $isEdit = isset($program) && $programId > 0;
                 Tips
             </p>
             <ul class="mt-2 list-inside list-disc space-y-1.5 text-xs leading-relaxed text-amber-900/90 sm:text-sm">
-                <li>Save basics first, then add photos and videos below.</li>
+                <li>Gallery images and videos upload as soon as you drop or pick them (no need to press Save first on this screen).</li>
                 <li>First gallery image can be used as the card cover (“Set cover”).</li>
                 <li>Large MP4 uploads may need a higher PHP <code class="rounded bg-amber-100/80 px-1">upload_max_filesize</code>.</li>
             </ul>
@@ -257,6 +257,116 @@ $isEdit = isset($program) && $programId > 0;
         showToast._t = setTimeout(function () { toastEl.classList.add('hidden'); }, 4200);
     }
 
+    function parseJsonResponse(r) {
+        return r.text().then(function (text) {
+            var j;
+            try {
+                j = JSON.parse(text);
+            } catch (e) {
+                throw new Error(text ? text.slice(0, 160) : (r.status + ' ' + r.statusText));
+            }
+            if (!r.ok || !j || !j.ok) {
+                throw new Error((j && j.error) ? j.error : (r.statusText || 'Request failed'));
+            }
+            return j;
+        });
+    }
+
+    function clearMediaEmptyHint() {
+        var hint = document.getElementById('media-empty-hint');
+        if (hint) hint.remove();
+    }
+
+    function escAttr(s) {
+        return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function appendImageGalleryRow(j) {
+        var list = document.getElementById('media-sortable');
+        if (!list || !j || !j.id || !j.url) return;
+        clearMediaEmptyHint();
+        var li = document.createElement('li');
+        li.className = 'media-row group rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300 hover:shadow-md sm:p-4';
+        li.setAttribute('data-id', String(j.id));
+        li.innerHTML =
+            '<div class="flex flex-col gap-3 sm:flex-row sm:items-stretch">' +
+            '<div class="flex shrink-0 items-center gap-2 sm:flex-col sm:items-center sm:pt-1">' +
+            '<span class="drag-handle flex h-11 w-11 cursor-grab select-none items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 active:cursor-grabbing hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span>' +
+            '</div>' +
+            '<div class="relative h-40 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-24 sm:w-36 sm:flex-shrink-0">' +
+            '<img src="' + escAttr(j.url) + '" alt="" class="h-full w-full object-cover" loading="lazy" width="144" height="96">' +
+            '</div>' +
+            '<div class="min-w-0 flex-1 space-y-3">' +
+            '<form class="caption-form space-y-2" data-media-id="' + escAttr(String(j.id)) + '">' +
+            '<label class="text-xs font-medium text-slate-600">Caption</label>' +
+            '<div class="flex flex-col gap-2 sm:flex-row sm:items-end">' +
+            '<input type="text" name="caption" class="input min-h-[44px] flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm shadow-sm" value="" placeholder="Optional label">' +
+            '<button type="submit" class="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-primary-800 hover:bg-slate-50">Save</button>' +
+            '</div></form>' +
+            '<div class="flex flex-wrap gap-2 border-t border-slate-100 pt-3">' +
+            '<a href="' + escAttr(ADMIN_URL + '?action=program_media_set_cover&id=' + j.id) + '" class="inline-flex items-center gap-1.5 rounded-lg bg-accent-100 px-3 py-2 text-xs font-bold text-amber-950 hover:bg-accent-200"><i class="fa-regular fa-image"></i> Set as cover</a>' +
+            '<a href="' + escAttr(ADMIN_URL + '?action=program_media_delete&id=' + j.id) + '" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800 hover:bg-red-100" onclick="return confirm(\'Delete this item?\');"><i class="fa-regular fa-trash-can"></i> Delete</a>' +
+            '</div></div></div>';
+        list.appendChild(li);
+    }
+
+    function appendVideoFileGalleryRow(j) {
+        var list = document.getElementById('media-sortable');
+        if (!list || !j || !j.id) return;
+        clearMediaEmptyHint();
+        var li = document.createElement('li');
+        li.className = 'media-row group rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300 hover:shadow-md sm:p-4';
+        li.setAttribute('data-id', String(j.id));
+        li.innerHTML =
+            '<div class="flex flex-col gap-3 sm:flex-row sm:items-stretch">' +
+            '<div class="flex shrink-0 items-center gap-2 sm:flex-col sm:items-center sm:pt-1">' +
+            '<span class="drag-handle flex h-11 w-11 cursor-grab select-none items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 active:cursor-grabbing hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span>' +
+            '</div>' +
+            '<div class="relative h-40 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-24 sm:w-36 sm:flex-shrink-0">' +
+            '<div class="flex h-full w-full flex-col items-center justify-center gap-1 bg-slate-900/90 text-white">' +
+            '<i class="fa-solid fa-circle-play text-3xl text-accent-400"></i><span class="text-xs font-bold uppercase tracking-wide">Video</span></div></div>' +
+            '<div class="min-w-0 flex-1 space-y-3">' +
+            '<form class="caption-form space-y-2" data-media-id="' + escAttr(String(j.id)) + '">' +
+            '<label class="text-xs font-medium text-slate-600">Caption</label>' +
+            '<div class="flex flex-col gap-2 sm:flex-row sm:items-end">' +
+            '<input type="text" name="caption" class="input min-h-[44px] flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm shadow-sm" value="" placeholder="Optional label">' +
+            '<button type="submit" class="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-primary-800 hover:bg-slate-50">Save</button>' +
+            '</div></form>' +
+            '<div class="flex flex-wrap gap-2 border-t border-slate-100 pt-3">' +
+            '<a href="' + escAttr(ADMIN_URL + '?action=program_media_delete&id=' + j.id) + '" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800 hover:bg-red-100" onclick="return confirm(\'Delete this item?\');"><i class="fa-regular fa-trash-can"></i> Delete</a>' +
+            '</div></div></div>';
+        list.appendChild(li);
+    }
+
+    function appendExternalVideoRow(j) {
+        var list = document.getElementById('media-sortable');
+        if (!list || !j || !j.id || !j.external_url) return;
+        clearMediaEmptyHint();
+        var li = document.createElement('li');
+        li.className = 'media-row group rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition hover:border-slate-300 hover:shadow-md sm:p-4';
+        li.setAttribute('data-id', String(j.id));
+        li.innerHTML =
+            '<div class="flex flex-col gap-3 sm:flex-row sm:items-stretch">' +
+            '<div class="flex shrink-0 items-center gap-2 sm:flex-col sm:items-center sm:pt-1">' +
+            '<span class="drag-handle flex h-11 w-11 cursor-grab select-none items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-500 active:cursor-grabbing hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700" title="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span>' +
+            '</div>' +
+            '<div class="relative h-40 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-24 sm:w-36 sm:flex-shrink-0">' +
+            '<div class="flex h-full w-full flex-col items-center justify-center gap-1 bg-slate-900/90 text-white">' +
+            '<i class="fa-solid fa-circle-play text-3xl text-accent-400"></i><span class="text-xs font-bold uppercase tracking-wide">Video</span></div></div>' +
+            '<div class="min-w-0 flex-1 space-y-3">' +
+            '<p class="text-xs text-slate-500 break-all"><a href="' + escAttr(j.external_url) + '" target="_blank" rel="noopener" class="text-primary-700 hover:underline">' + escAttr(j.external_url) + '</a></p>' +
+            '<form class="caption-form space-y-2" data-media-id="' + escAttr(String(j.id)) + '">' +
+            '<label class="text-xs font-medium text-slate-600">Caption</label>' +
+            '<div class="flex flex-col gap-2 sm:flex-row sm:items-end">' +
+            '<input type="text" name="caption" class="input min-h-[44px] flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm shadow-sm" value="" placeholder="Optional label">' +
+            '<button type="submit" class="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-primary-800 hover:bg-slate-50">Save</button>' +
+            '</div></form>' +
+            '<div class="flex flex-wrap gap-2 border-t border-slate-100 pt-3">' +
+            '<a href="' + escAttr(ADMIN_URL + '?action=program_media_delete&id=' + j.id) + '" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-800 hover:bg-red-100" onclick="return confirm(\'Delete this item?\');"><i class="fa-regular fa-trash-can"></i> Delete</a>' +
+            '</div></div></div>';
+        list.appendChild(li);
+    }
+
     var mainForm = document.getElementById('program-main-form');
     var mobileSave = document.getElementById('program-mobile-save');
     if (mainForm && mobileSave) {
@@ -266,21 +376,27 @@ $isEdit = isset($program) && $programId > 0;
         });
     }
 
-    function uploadFiles(action, files) {
+    function uploadOneFile(action, file) {
+        var fd = new FormData();
+        fd.append('program_id', String(PROGRAM_ID));
+        fd.append('file', file);
+        var url = ADMIN_API + '?action=' + encodeURIComponent(action) + '&program_id=' + encodeURIComponent(String(PROGRAM_ID));
+        return fetch(url, { method: 'POST', body: fd, credentials: 'same-origin' }).then(parseJsonResponse);
+    }
+
+    function uploadFiles(action, files, onEach) {
         if (!files || !files.length) return Promise.resolve();
-        var i, fd, p = Promise.resolve();
-        function one(file) {
-            fd = new FormData();
-            fd.append('program_id', String(PROGRAM_ID));
-            fd.append('file', file);
-            return fetch(ADMIN_URL + '?action=' + action, { method: 'POST', body: fd, credentials: 'same-origin' })
-                .then(function (r) { return r.json(); })
-                .then(function (j) {
-                    if (!j.ok) throw new Error(j.error || 'Upload failed');
-                });
-        }
+        var i;
+        var p = Promise.resolve();
         for (i = 0; i < files.length; i++) {
-            p = p.then(one.bind(null, files[i]));
+            (function (file) {
+                p = p.then(function () {
+                    return uploadOneFile(action, file).then(function (j) {
+                        if (onEach) onEach(j, action);
+                        return j;
+                    });
+                });
+            })(files[i]);
         }
         return p;
     }
@@ -300,14 +416,18 @@ $isEdit = isset($program) && $programId > 0;
         ['dragleave', 'drop'].forEach(function (ev) {
             zone.addEventListener(ev, function (e) { e.preventDefault(); e.stopPropagation(); zone.classList.remove('border-primary-500', 'bg-primary-50', 'ring-2', 'ring-primary-200'); });
         });
+        function onDone(j, act) {
+            if (act === 'program_media_upload') appendImageGalleryRow(j);
+            else if (act === 'program_video_upload') appendVideoFileGalleryRow(j);
+        }
         zone.addEventListener('drop', function (e) {
             var files = e.dataTransfer.files;
             showToast('Uploading…');
-            uploadFiles(action, files).then(function () { showToast('Upload complete'); window.location.reload(); }).catch(function (err) { showToast(err.message || String(err), true); });
+            uploadFiles(action, files, onDone).then(function () { showToast('Upload complete'); }).catch(function (err) { showToast(err.message || String(err), true); });
         });
         input.addEventListener('change', function () {
             showToast('Uploading…');
-            uploadFiles(action, input.files).then(function () { showToast('Upload complete'); window.location.reload(); }).catch(function (err) { showToast(err.message || String(err), true); });
+            uploadFiles(action, input.files, onDone).then(function () { showToast('Upload complete'); input.value = ''; }).catch(function (err) { showToast(err.message || String(err), true); });
         });
     }
 
@@ -321,11 +441,11 @@ $isEdit = isset($program) && $programId > 0;
             var fd = new FormData(urlForm);
             fd.append('program_id', String(PROGRAM_ID));
             fetch(ADMIN_API + '?action=program_video_url_save&program_id=' + encodeURIComponent(String(PROGRAM_ID)), { method: 'POST', body: fd, credentials: 'same-origin' })
-                .then(function (r) { return r.json(); })
+                .then(parseJsonResponse)
                 .then(function (j) {
-                    if (!j.ok) throw new Error(j.error || 'Failed');
+                    appendExternalVideoRow(j);
                     showToast('Video link added');
-                    window.location.reload();
+                    urlForm.reset();
                 })
                 .catch(function (err) { showToast(err.message || String(err), true); });
         });
@@ -345,18 +465,17 @@ $isEdit = isset($program) && $programId > 0;
                     body: JSON.stringify({ ids: ids }),
                     credentials: 'same-origin'
                 })
-                    .then(function (r) { return r.json(); })
-                    .then(function (j) {
-                        if (!j.ok) throw new Error(j.error || 'Reorder failed');
-                        showToast('Order saved');
-                    })
+                    .then(parseJsonResponse)
+                    .then(function () { showToast('Order saved'); })
                     .catch(function (err) { showToast(err.message || String(err), true); });
             }
         });
     }
 
-    document.querySelectorAll('.caption-form').forEach(function (form) {
-        form.addEventListener('submit', function (e) {
+    if (list) {
+        list.addEventListener('submit', function (e) {
+            var form = e.target && e.target.closest ? e.target.closest('.caption-form') : null;
+            if (!form || !list.contains(form)) return;
             e.preventDefault();
             var id = form.getAttribute('data-media-id');
             var cap = form.querySelector('input[name="caption"]');
@@ -364,14 +483,11 @@ $isEdit = isset($program) && $programId > 0;
             fd.append('id', id);
             fd.append('caption', cap ? cap.value : '');
             fetch(ADMIN_API + '?action=program_media_caption_save', { method: 'POST', body: fd, credentials: 'same-origin' })
-                .then(function (r) { return r.json(); })
-                .then(function (j) {
-                    if (!j.ok) throw new Error(j.error || 'Save failed');
-                    showToast('Caption saved');
-                })
+                .then(parseJsonResponse)
+                .then(function () { showToast('Caption saved'); })
                 .catch(function (err) { showToast(err.message || String(err), true); });
         });
-    });
+    }
 })();
 </script>
 <?php endif; ?>

@@ -5,6 +5,7 @@ require_once APP_PATH . '/models/Staff.php';
 require_once APP_PATH . '/models/Program.php';
 require_once APP_PATH . '/models/ProgramMedia.php';
 require_once APP_PATH . '/helpers/ImageProcessor.php';
+require_once APP_PATH . '/helpers/ContentSanitizer.php';
 
 class AdminController extends BaseController {
     private $pageModel;
@@ -43,7 +44,7 @@ class AdminController extends BaseController {
         $data = [
             'slug' => $this->sanitize($_POST['slug']),
             'title' => $this->sanitize($_POST['title']),
-            'content' => $this->sanitize($_POST['content']),
+            'content' => $this->sanitize(ContentSanitizer::stripDataImageUris((string) ($_POST['content'] ?? ''))),
         ];
 
         $id = $_POST['id'] ?? null;
@@ -116,11 +117,11 @@ class AdminController extends BaseController {
         $name = $this->sanitize($_POST['name'] ?? '');
         $department = $this->sanitize($_POST['department'] ?? '');
         $faculty = $this->sanitize($_POST['faculty'] ?? '');
-        $description = $this->sanitize($_POST['description'] ?? '');
-        $detailRaw = trim((string) ($_POST['detail_content'] ?? ''));
+        $description = $this->sanitize(ContentSanitizer::stripDataImageUris((string) ($_POST['description'] ?? '')));
+        $detailRaw = trim(ContentSanitizer::stripDataImageUris((string) ($_POST['detail_content'] ?? '')));
         $detailContent = htmlspecialchars($detailRaw, ENT_QUOTES, 'UTF-8');
-        $coverImage = trim((string) ($_POST['cover_image'] ?? ''));
-        $coverImage = $coverImage !== '' ? htmlspecialchars(strip_tags($coverImage), ENT_QUOTES, 'UTF-8') : '';
+        $coverRaw = trim(ContentSanitizer::stripDataImageUris((string) ($_POST['cover_image'] ?? '')));
+        $coverImage = $coverRaw !== '' ? htmlspecialchars(strip_tags($coverRaw), ENT_QUOTES, 'UTF-8') : '';
 
         $slugInput = trim((string) ($_POST['slug'] ?? ''));
         $baseSlug = $slugInput !== '' ? Program::slugify($slugInput) : Program::slugify($name);
@@ -143,12 +144,13 @@ class AdminController extends BaseController {
 
         if ($id > 0) {
             $this->programModel->update($id, $data);
+            $savedId = $id;
         } else {
             $data['created_at'] = $now;
-            $this->programModel->create($data);
+            $savedId = (int) $this->programModel->create($data);
         }
 
-        $this->redirect(ADMIN_URL . '?action=programs');
+        $this->redirect(ADMIN_URL . '?action=program_edit&id=' . max(1, $savedId));
     }
 
     public function programDelete($id) {
@@ -282,7 +284,7 @@ class AdminController extends BaseController {
             'sort_order' => $sort,
         ]);
 
-        $this->json(['ok' => true, 'id' => $mid]);
+        $this->json(['ok' => true, 'id' => $mid, 'external_url' => $url]);
     }
 
     public function programMediaReorder() {

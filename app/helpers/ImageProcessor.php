@@ -64,30 +64,30 @@ class ImageProcessor {
             $h = $nh;
         }
 
-        $blob = self::jpegBlobUnderMaxBytes($gd, $w, $h, $maxBytes);
+        $jpegBytes = self::buildJpegUnderMaxBytes($gd, $w, $h, $maxBytes);
         if ($gd !== null && $gd !== false) {
             self::freeImage($gd);
         }
 
-        if ($blob === false || $blob === null || $blob === '') {
+        if ($jpegBytes === false || $jpegBytes === null || $jpegBytes === '') {
             return false;
         }
         $dir = dirname($destPath);
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
-        return file_put_contents($destPath, $blob) !== false;
+        return file_put_contents($destPath, $jpegBytes) !== false;
     }
 
     /**
      * Encode as JPEG under $maxBytes by lowering quality then uniformly scaling (same factor for width and height).
-     * Frees $gd and sets it to null before returning a string; leaves $gd live only while returning false without a blob.
+     * Frees $gd and sets it to null before returning bytes written to disk only (never stored in the database).
      *
      * @param resource|\GdImage|null|false $gd
      * @return string|false
      */
-    private static function jpegBlobUnderMaxBytes(&$gd, &$w, &$h, $maxBytes) {
-        $blob = false;
+    private static function buildJpegUnderMaxBytes(&$gd, &$w, &$h, $maxBytes) {
+        $chosen = false;
         for ($round = 0; $round < 56; $round++) {
             $best = null;
             $bestLen = PHP_INT_MAX;
@@ -111,12 +111,12 @@ class ImageProcessor {
                 }
             }
 
-            $blob = $best;
+            $chosen = $best;
 
-            if ($blob !== null && strlen($blob) <= $maxBytes) {
+            if ($chosen !== null && strlen($chosen) <= $maxBytes) {
                 self::freeImage($gd);
                 $gd = null;
-                return $blob;
+                return $chosen;
             }
 
             if ($w <= 20 && $h <= 20) {
@@ -139,10 +139,10 @@ class ImageProcessor {
             $h = $nh;
         }
 
-        if ($blob !== false && $blob !== null && $blob !== '') {
+        if ($chosen !== false && $chosen !== null && $chosen !== '') {
             self::freeImage($gd);
             $gd = null;
-            return $blob;
+            return $chosen;
         }
 
         ob_start();

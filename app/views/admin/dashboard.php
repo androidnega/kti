@@ -1,149 +1,82 @@
 <?php ob_start(); ?>
 
-<div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+<div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-        <p class="text-xs font-semibold tracking-widest text-primary-600 uppercase">Admin Overview</p>
-        <h1 class="mt-2 text-3xl font-bold tracking-tight text-gray-900">Dashboard</h1>
-        <p class="mt-1 text-sm text-gray-500">Welcome back, <span class="font-semibold text-gray-800"><?= Auth::user()['name'] ?></span>. Here’s what’s happening in your system.</p>
+        <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Dashboard</h1>
+        <p class="mt-1 text-sm text-slate-600">Signed in as <span class="font-medium text-slate-800"><?= htmlspecialchars(Auth::user()['name'] ?? '', ENT_QUOTES, 'UTF-8') ?></span></p>
     </div>
-    <div class="flex items-center gap-3">
-        <a href="<?= ADMIN_URL ?>?action=page_create" class="inline-flex items-center gap-2 rounded-lg bg-primary-900 px-4 py-2 text-sm font-medium text-white hover:bg-black">
-            <i class="fa-solid fa-plus text-xs"></i>
-            New Page
+    <div class="flex flex-wrap gap-2">
+        <a href="<?= ADMIN_URL ?>?action=page_create" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:border-slate-400 hover:bg-slate-50">
+            <i class="fa-solid fa-plus text-xs text-slate-500"></i>
+            New page
         </a>
-        <a href="<?= ADMIN_URL ?>?action=staff_create" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-            <i class="fa-solid fa-user-plus text-xs"></i>
-            Add Staff
+        <a href="<?= ADMIN_URL ?>?action=staff_create" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:border-slate-400 hover:bg-slate-50">
+            <i class="fa-solid fa-user-plus text-xs text-slate-500"></i>
+            Add staff
         </a>
     </div>
 </div>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="card bg-primary-900 text-white border-none">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-primary-200 text-xs font-medium uppercase tracking-wide">Total Pages</p>
-                <p class="text-4xl font-bold mt-3 leading-none"><?= $stats['pages'] ?></p>
-                <p class="mt-2 text-xs text-primary-300">Manage static and dynamic content</p>
-            </div>
-            <div class="w-10 h-10 rounded bg-accent-400 text-primary-900 flex items-center justify-center">
-                <i class="fa-solid fa-file-lines text-lg"></i>
-            </div>
-        </div>
+<div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="rounded-xl border border-slate-200 bg-white px-5 py-4">
+        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Pages</p>
+        <p class="mt-2 text-3xl font-semibold tabular-nums text-slate-900"><?= (int) $stats['pages'] ?></p>
     </div>
-
-    <div class="card bg-accent-400 text-primary-900 border-none">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-primary-800 text-xs font-medium uppercase tracking-wide">Staff Members</p>
-                <p class="text-4xl font-bold mt-3 leading-none"><?= $stats['staff'] ?></p>
-                <p class="mt-2 text-xs text-primary-800/80">Academic and non-teaching staff</p>
-            </div>
-            <div class="w-10 h-10 rounded bg-primary-900 text-accent-400 flex items-center justify-center">
-                <i class="fa-solid fa-users text-lg"></i>
-            </div>
-        </div>
+    <div class="rounded-xl border border-slate-200 bg-white px-5 py-4">
+        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Staff</p>
+        <p class="mt-2 text-3xl font-semibold tabular-nums text-slate-900"><?= (int) $stats['staff'] ?></p>
     </div>
-
-    <div class="card bg-primary-800 text-white border-none">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-primary-200 text-xs font-medium uppercase tracking-wide">Programs</p>
-                <p class="text-4xl font-bold mt-3 leading-none"><?= $stats['programs'] ?></p>
-                <p class="mt-2 text-xs text-primary-300">Active technical and vocational programs</p>
-            </div>
-            <div class="w-10 h-10 rounded bg-accent-400 text-primary-900 flex items-center justify-center">
-                <i class="fa-solid fa-chalkboard-user text-lg"></i>
-            </div>
-        </div>
+    <div class="rounded-xl border border-slate-200 bg-white px-5 py-4">
+        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Programs</p>
+        <p class="mt-2 text-3xl font-semibold tabular-nums text-slate-900"><?= (int) $stats['programs'] ?></p>
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="lg:col-span-2 card">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <span>Quick Actions</span>
-                <span class="inline-flex items-center rounded-full bg-primary-50 px-2 py-0.5 text-[11px] font-medium text-primary-700">Fast access</span>
-            </h2>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <a href="<?= ADMIN_URL ?>?action=page_create" class="group rounded-xl border border-gray-200 bg-white p-4 hover:border-primary-200 hover:shadow-sm transition flex flex-col justify-between">
-                <div>
-                    <div class="inline-flex items-center justify-center rounded-lg bg-primary-50 text-primary-700 w-9 h-9 mb-3">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                    </div>
-                    <h3 class="text-sm font-semibold text-gray-900">Create New Page</h3>
-                    <p class="mt-1 text-xs text-gray-500">Add or update website content quickly.</p>
-                </div>
-                <span class="mt-3 text-xs font-medium text-primary-600 group-hover:text-primary-700 inline-flex items-center">
-                    Open builder
-                    <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </span>
-            </a>
-
-            <a href="<?= ADMIN_URL ?>?action=staff_create" class="group rounded-xl border border-gray-200 bg-white p-4 hover:border-accent-300 hover:shadow-sm transition flex flex-col justify-between">
-                <div>
-                    <div class="inline-flex items-center justify-center rounded-lg bg-accent-100 text-accent-800 w-9 h-9 mb-3">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                    </div>
-                    <h3 class="text-sm font-semibold text-gray-900">Add Staff Member</h3>
-                    <p class="mt-1 text-xs text-gray-500">Maintain an up-to-date staff directory.</p>
-                </div>
-                <span class="mt-3 text-xs font-medium text-accent-700 group-hover:text-accent-800 inline-flex items-center">
-                    Manage staff
-                    <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </span>
-            </a>
-
-            <a href="<?= ADMIN_URL ?>?action=program_create" class="group rounded-xl border border-gray-200 bg-white p-4 hover:border-primary-300 hover:shadow-sm transition flex flex-col justify-between">
-                <div>
-                    <div class="inline-flex items-center justify-center rounded-lg bg-primary-100 text-primary-800 w-9 h-9 mb-3">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                        </svg>
-                    </div>
-                    <h3 class="text-sm font-semibold text-gray-900">Add Program</h3>
-                    <p class="mt-1 text-xs text-gray-500">Update academic and technical offerings.</p>
-                </div>
-                <span class="mt-3 text-xs font-medium text-primary-700 group-hover:text-primary-900 inline-flex items-center">
-                    Configure programs
-                    <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                </span>
-            </a>
-        </div>
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <div class="rounded-xl border border-slate-200 bg-white p-5 lg:col-span-2">
+        <h2 class="text-sm font-semibold text-slate-900">Quick links</h2>
+        <ul class="mt-4 divide-y divide-slate-100 border-t border-slate-100">
+            <li>
+                <a href="<?= ADMIN_URL ?>?action=page_create" class="flex items-center justify-between gap-3 py-3 text-sm text-slate-700 hover:text-slate-900">
+                    <span>Create page</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                </a>
+            </li>
+            <li>
+                <a href="<?= ADMIN_URL ?>?action=staff_create" class="flex items-center justify-between gap-3 py-3 text-sm text-slate-700 hover:text-slate-900">
+                    <span>Add staff member</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                </a>
+            </li>
+            <li>
+                <a href="<?= ADMIN_URL ?>?action=program_create" class="flex items-center justify-between gap-3 py-3 text-sm text-slate-700 hover:text-slate-900">
+                    <span>Add program</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                </a>
+            </li>
+            <li>
+                <a href="<?= ADMIN_URL ?>?action=programs" class="flex items-center justify-between gap-3 py-3 text-sm text-slate-700 hover:text-slate-900">
+                    <span>Manage programs</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+                </a>
+            </li>
+        </ul>
     </div>
 
-    <div class="card">
-        <h2 class="text-lg font-semibold mb-4 text-gray-900 flex items-center justify-between">
-            <span>System Information</span>
-            <span class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600">Status</span>
-        </h2>
-        <dl class="space-y-3">
-            <div class="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2.5">
-                <dt class="text-xs font-medium text-gray-500">PHP Version</dt>
-                <dd class="text-sm font-semibold text-gray-900"><?= phpversion() ?></dd>
+    <div class="rounded-xl border border-slate-200 bg-white p-5">
+        <h2 class="text-sm font-semibold text-slate-900">System</h2>
+        <dl class="mt-4 space-y-3 text-sm">
+            <div class="flex justify-between gap-2 border-b border-slate-100 pb-3">
+                <dt class="text-slate-500">PHP</dt>
+                <dd class="font-medium text-slate-900"><?= htmlspecialchars(phpversion(), ENT_QUOTES, 'UTF-8') ?></dd>
             </div>
-            <div class="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2.5">
-                <dt class="text-xs font-medium text-gray-500">Database</dt>
-                <dd class="text-sm font-semibold text-gray-900">SQLite</dd>
+            <div class="flex justify-between gap-2 border-b border-slate-100 pb-3">
+                <dt class="text-slate-500">Database</dt>
+                <dd class="font-medium text-slate-900">SQLite</dd>
             </div>
-            <div class="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2.5">
-                <dt class="text-xs font-medium text-gray-500">Environment</dt>
-                <dd class="inline-flex items-center gap-1 text-xs font-semibold <?= ENVIRONMENT === 'production' ? 'text-accent-800' : 'text-amber-700' ?>">
-                    <span class="inline-block h-2 w-2 rounded-full <?= ENVIRONMENT === 'production' ? 'bg-accent-500' : 'bg-amber-400' ?>"></span>
-                    <?= ucfirst(ENVIRONMENT) ?>
-                </dd>
+            <div class="flex justify-between gap-2">
+                <dt class="text-slate-500">Environment</dt>
+                <dd class="font-medium text-slate-900"><?= htmlspecialchars(ucfirst(ENVIRONMENT), ENT_QUOTES, 'UTF-8') ?></dd>
             </div>
         </dl>
     </div>
