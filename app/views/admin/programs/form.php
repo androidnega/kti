@@ -132,7 +132,7 @@ $galleryImagesFull = $galleryImageCount >= 9;
         <div>
                         <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 sm:text-sm sm:normal-case sm:tracking-normal">Detail page content</label>
                         <p class="mb-2 text-xs text-slate-500 sm:text-sm">Rich text: headings, bullets, numbered lists, quotes, links. Saved HTML is cleaned automatically for safety.</p>
-                        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm focus-within:ring-2 focus-within:ring-primary-500/25">
+                        <div class="program-quill-wrap overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm focus-within:ring-2 focus-within:ring-primary-500/25 [&_.ql-container]:pointer-events-auto [&_.ql-editor]:pointer-events-auto [&_.ql-toolbar]:pointer-events-auto">
                             <div id="program-detail-quill" class="min-h-[240px] [&_.ql-toolbar]:rounded-t-xl [&_.ql-toolbar]:border-0 [&_.ql-toolbar]:border-b [&_.ql-toolbar]:border-slate-200 [&_.ql-toolbar]:bg-slate-50 [&_.ql-container]:border-0 [&_.ql-editor]:min-h-[220px] [&_.ql-editor]:px-4 [&_.ql-editor]:py-4 [&_.ql-editor]:text-[15px] [&_.ql-editor]:leading-relaxed [&_.ql-editor_h2]:mb-2 [&_.ql-editor_h2]:mt-4 [&_.ql-editor_h2]:text-xl [&_.ql-editor_h2]:font-bold [&_.ql-editor_h3]:mb-2 [&_.ql-editor_h3]:mt-3 [&_.ql-editor_h3]:text-lg [&_.ql-editor_h3]:font-bold [&_.ql-editor_h4]:mb-1 [&_.ql-editor_h4]:mt-2 [&_.ql-editor_h4]:text-base [&_.ql-editor_h4]:font-bold [&_.ql-editor_blockquote]:border-l-4 [&_.ql-editor_blockquote]:border-primary-300 [&_.ql-editor_blockquote]:bg-slate-50 [&_.ql-editor_blockquote]:py-1 [&_.ql-editor_ul]:my-2 [&_.ql-editor_ol]:my-2"></div>
                         </div>
                         <textarea name="detail_content" id="program-detail-hidden" class="sr-only" tabindex="-1" aria-hidden="true"></textarea>
@@ -188,11 +188,11 @@ $galleryImagesFull = $galleryImageCount >= 9;
             <h3 class="text-sm font-bold text-slate-800">Images</h3>
             <p class="mt-0.5 text-xs font-medium text-slate-600"><?= (int) $galleryImageCount ?> of 9 photos<?= $galleryImageCount >= 9 ? ' (gallery full)' : '' ?></p>
             <p class="mt-1 text-xs text-slate-500 sm:text-sm">JPEG, PNG, WebP, or GIF — stored as optimized JPEG.</p>
-            <div id="drop-images" role="button" tabindex="0" aria-label="Upload images" class="mt-3 flex min-h-[min(12rem,40vh)] flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/80 px-4 py-10 text-center transition sm:min-h-[11rem] <?= $galleryImagesFull ? 'cursor-not-allowed opacity-60 pointer-events-none' : 'cursor-pointer hover:border-primary-400 hover:bg-primary-50/50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 active:scale-[0.99]' ?>">
+            <div id="program-gallery-drop-zone" role="button" tabindex="0" aria-label="Upload images" class="program-gallery-drop-zone mt-3 flex min-h-[min(12rem,40vh)] flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/80 px-4 py-10 text-center transition sm:min-h-[11rem] <?= $galleryImagesFull ? 'cursor-not-allowed opacity-60 pointer-events-none' : 'cursor-pointer hover:border-primary-400 hover:bg-primary-50/50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 active:scale-[0.99]' ?>">
                 <span class="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-900 text-2xl text-accent-400 shadow-inner"><i class="fa-solid fa-cloud-arrow-up"></i></span>
                 <span class="max-w-xs text-sm font-medium text-slate-700">Drop images here or <span class="text-primary-700 underline decoration-2 underline-offset-2">tap to browse</span></span>
                 <span class="text-xs text-slate-500">Select or drop many at once — up to five upload together. Each department can have up to nine photos.</span>
-                <input type="file" id="file-images" class="sr-only" accept="image/*" multiple<?= $galleryImagesFull ? ' disabled' : '' ?>>
+                <input type="file" id="program-gallery-images-input" class="sr-only" accept="image/*" multiple<?= $galleryImagesFull ? ' disabled' : '' ?>>
             </div>
         </div>
         <div>
@@ -314,6 +314,7 @@ $galleryImagesFull = $galleryImageCount >= 9;
         programQuill.on('text-change', function () {
             if (quillHidden) quillHidden.value = programQuill.root.innerHTML;
         });
+        programQuill.enable(true);
     }
 
     var toastEl = document.getElementById('admin-toast');
@@ -679,17 +680,20 @@ $galleryImagesFull = $galleryImageCount >= 9;
     }
 
     function updateGalleryDropZone() {
-        var zone = document.getElementById('drop-images');
-        var input = document.getElementById('file-images');
-        if (!zone) return;
-        var full = countGalleryImageSlots() >= GALLERY_MAX_IMAGES;
-        ['pointer-events-none', 'opacity-60', 'cursor-not-allowed'].forEach(function (c) {
-            zone.classList.toggle(c, full);
-        });
-        ['cursor-pointer', 'hover:border-primary-400', 'hover:bg-primary-50/50', 'focus:outline-none', 'focus:ring-2', 'focus:ring-primary-500', 'focus:ring-offset-2', 'active:scale-[0.99]'].forEach(function (c) {
-            zone.classList.toggle(c, !full);
-        });
+        var zone = document.getElementById('program-gallery-drop-zone');
+        var input = document.getElementById('program-gallery-images-input');
+        var list = document.getElementById('media-sortable');
+        var full = list ? countGalleryImageSlots() >= GALLERY_MAX_IMAGES : false;
+        if (zone) {
+            ['pointer-events-none', 'opacity-60', 'cursor-not-allowed'].forEach(function (c) {
+                zone.classList.toggle(c, full);
+            });
+            ['cursor-pointer', 'hover:border-primary-400', 'hover:bg-primary-50/50', 'focus:outline-none', 'focus:ring-2', 'focus:ring-primary-500', 'focus:ring-offset-2', 'active:scale-[0.99]'].forEach(function (c) {
+                zone.classList.toggle(c, !full);
+            });
+        }
         if (input) input.disabled = !!full;
+        if (programQuill) programQuill.enable(true);
     }
 
     function uploadFiles(action, files, onEach) {
@@ -780,7 +784,7 @@ $galleryImagesFull = $galleryImageCount >= 9;
         });
     }
 
-    wireDrop('drop-images', 'file-images', 'program_media_upload');
+    wireDrop('program-gallery-drop-zone', 'program-gallery-images-input', 'program_media_upload');
     wireDrop('drop-videos', 'file-videos', 'program_video_upload');
     updateGalleryDropZone();
 
