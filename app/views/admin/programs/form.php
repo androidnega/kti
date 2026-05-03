@@ -275,8 +275,9 @@ $galleryImagesFull = $galleryImageCount >= 9;
     </div>
 </div>
 
-<link rel="stylesheet" href="https://cdn.quilljs.com/1.3.7/quill.snow.css" crossorigin="anonymous">
-<script src="https://cdn.quilljs.com/1.3.7/quill.min.js" crossorigin="anonymous"></script>
+<?php $quillVendorBase = rtrim(APP_URL, '/') . '/assets/vendor/quill'; ?>
+<link rel="stylesheet" href="<?= htmlspecialchars($quillVendorBase) ?>/quill.snow.css">
+<script src="<?= htmlspecialchars($quillVendorBase) ?>/quill.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script>
 (function () {
