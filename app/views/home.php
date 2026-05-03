@@ -192,11 +192,31 @@
         <h2 class="section-title text-center text-primary-900">Featured Programs</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
             <?php foreach ($programs as $program): ?>
-            <div class="card hover:shadow-lg transition-shadow border border-gray-200">
+            <?php
+            $slug = trim((string) ($program['slug'] ?? ''));
+            $cover = !empty($program['cover_image'])
+                ? rtrim(APP_URL, '/') . '/' . ltrim($program['cover_image'], '/')
+                : '';
+            $cardClass = 'card hover:shadow-lg transition-shadow border border-gray-200';
+            ?>
+            <?php if ($slug !== ''): ?>
+            <a href="<?= htmlspecialchars(APP_URL . '?url=program/' . rawurlencode($slug)) ?>" class="block <?= $cardClass ?> text-left no-underline text-inherit focus:outline-none focus:ring-2 focus:ring-primary-500">
+            <?php else: ?>
+            <div class="<?= $cardClass ?>">
+            <?php endif; ?>
+                <?php if ($cover !== ''): ?>
+                <div class="aspect-[16/10] w-full overflow-hidden rounded-lg bg-gray-100 mb-4 -mt-1">
+                    <img src="<?= htmlspecialchars($cover) ?>" alt="<?= htmlspecialchars($program['name']) ?>" class="h-full w-full object-cover" loading="lazy">
+                </div>
+                <?php endif; ?>
                 <h3 class="text-xl font-semibold text-primary-600 mb-3"><?= htmlspecialchars($program['name']) ?></h3>
-                <p class="text-sm text-primary-500 mb-3 font-medium"><?= htmlspecialchars($program['department']) ?></p>
-                <p class="text-gray-600 line-clamp-3"><?= htmlspecialchars($program['description']) ?></p>
+                <p class="text-sm text-primary-500 mb-3 font-medium"><?= htmlspecialchars($program['department'] ?? '') ?></p>
+                <p class="text-gray-600 line-clamp-3"><?= htmlspecialchars($program['description'] ?? '') ?></p>
+            <?php if ($slug !== ''): ?>
+            </a>
+            <?php else: ?>
             </div>
+            <?php endif; ?>
             <?php endforeach; ?>
         </div>
         <div class="text-center mt-12">

@@ -30,6 +30,11 @@ define('APP_PATH', ROOT_PATH . '/app');
 define('PUBLIC_PATH', ROOT_PATH . '/public');
 define('STORAGE_PATH', ROOT_PATH . '/storage');
 define('UPLOAD_PATH', STORAGE_PATH . '/uploads');
+/** Web-accessible program images/videos (under public/) */
+define('PROGRAM_UPLOAD_PATH', PUBLIC_PATH . '/uploads/programs');
+define('PROGRAM_VIDEO_PATH', PUBLIC_PATH . '/uploads/videos');
+/** Max JPEG output size for program gallery images (bytes) */
+define('PROGRAM_IMAGE_MAX_BYTES', 256000);
 
 // Session Configuration
 define('SESSION_LIFETIME', 3600); // 1 hour

@@ -42,9 +42,28 @@ CREATE TABLE IF NOT EXISTS programs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     department TEXT,
+    faculty TEXT,
+    slug TEXT,
+    cover_image TEXT,
+    detail_content TEXT,
     description TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Gallery / video rows for each program (created at runtime if missing)
+CREATE TABLE IF NOT EXISTS program_media (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    program_id INTEGER NOT NULL,
+    media_type TEXT NOT NULL DEFAULT 'image',
+    file_path TEXT,
+    external_url TEXT,
+    caption TEXT,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_program_media_program ON program_media(program_id);
 
 -- Insert initial admin user (credentials should be changed in production)
 INSERT INTO users (name, email, password_hash, role) 
@@ -62,15 +81,11 @@ VALUES ('about', 'About Us', 'Kikam Technical Institute (KIMTECH) was establishe
 INSERT INTO pages (slug, title, content) 
 VALUES ('contact', 'Contact Us', 'Kikam Technical Institute, P.O. Box 4, Kikam, Western Region, Ghana. Takoradi Elubo Road, Kikam. Email: Kimtechmail@yahoo.com or kikamtechinst@ges.gov.gh. Phone: +233 54 656 1424, +233 54 220 2670, +233 24 438 0894');
 
--- Insert real programs offered at Kikam Technical Institute
-INSERT INTO programs (name, department, description) 
-VALUES 
-('Mechanical Engineering', 'Engineering', 'Study of mechanical systems, thermodynamics, and manufacturing. Equipped with modern machinery through the Oil and Gas Capacity Building Project.'),
-('Welding and Fabrication', 'Engineering', 'Comprehensive training in welding techniques, metal fabrication, and industrial applications with state-of-the-art equipment.'),
-('Electrical Engineering', 'Engineering', 'Focus on circuit design, power systems, and electronics. Hands-on training with modern electrical equipment and systems.'),
-('Building Construction', 'Construction', 'Practical training in construction techniques, building design, and project management for the construction industry.'),
-('Plumbing and Gas Fitting', 'Construction', 'Specialized training in plumbing systems, gas fitting, and installation techniques for residential and commercial applications.'),
-('Carpentry and Joinery', 'Construction', 'Comprehensive woodworking program covering carpentry, joinery, furniture making, and wood finishing techniques.'),
-('Auto Mechanics', 'Automotive', 'Complete automotive training covering engine repair, diagnostics, maintenance, and modern vehicle systems.'),
-('Electronics', 'Technology', 'Training in electronic systems, circuit design, repair, and maintenance of electronic devices and equipment.'),
-('General Technical', 'General', 'Broad-based technical education providing foundational skills across multiple technical disciplines.');
+-- Insert department programs (faculty = site filter group; sync ims/ via tools/sync_ims_programs.php for photos)
+INSERT INTO programs (name, department, faculty, slug, description) VALUES
+('Electrical Engineering Technology', 'Electrical Engineering Technology', 'Engineering', 'electrical-engineering-technology', 'Hands-on training in electrical installations, motor control, power distribution, and workshop practice aligned to industry standards.'),
+('Electronics Engineering', 'Electronics Engineering', 'Technology', 'electronics-engineering', 'Circuit design, electronic systems, troubleshooting, and maintenance of modern electronic equipment used in industry and everyday technology.'),
+('Fashion', 'Fashion', 'General', 'fashion', 'Garment construction, pattern making, textiles, and fashion entrepreneurship for the creative and apparel sector.'),
+('Mechanical Engineering', 'Mechanical Engineering', 'Engineering', 'mechanical-engineering', 'Mechanical systems, machining, thermodynamics, and manufacturing using modern workshop facilities.'),
+('Plumbing and Gas Fitting', 'Plumbing and Gas Fitting', 'Construction', 'plumbing-and-gas-fitting', 'Safe installation and maintenance of plumbing, sanitation, and gas systems for residential and commercial buildings.'),
+('Solar Technology', 'Solar Technology', 'Technology', 'solar-technology', 'Photovoltaic systems, renewable energy basics, site assessment, and practical solar installation skills.');

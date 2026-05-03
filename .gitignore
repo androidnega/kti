@@ -5,3 +5,12 @@ storage/uploads/*
 public/assets/css/output.css
 .DS_Store
 *.log
+
+# Program gallery JPEGs are large; keep on disk / deploy with `php tools/sync_ims_programs.php` on the server — do not commit binaries.
+public/uploads/programs/
+!public/uploads/programs/.gitkeep
+public/uploads/videos/
+!public/uploads/videos/.gitkeep
+
+# Local IMS source folders (run tools/sync_ims_programs.php locally or on server)
+ims/

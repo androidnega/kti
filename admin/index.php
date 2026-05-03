@@ -70,7 +70,28 @@ switch ($action) {
     case 'program_delete':
         $controller->programDelete($id);
         break;
-    
+    case 'program_media_upload':
+        $controller->programMediaUpload();
+        break;
+    case 'program_video_upload':
+        $controller->programVideoUpload();
+        break;
+    case 'program_video_url_save':
+        $controller->programVideoUrlSave();
+        break;
+    case 'program_media_reorder':
+        $controller->programMediaReorder();
+        break;
+    case 'program_media_delete':
+        $controller->programMediaDelete($id);
+        break;
+    case 'program_media_set_cover':
+        $controller->programMediaSetCover($id);
+        break;
+    case 'program_media_caption_save':
+        $controller->programMediaCaptionSave();
+        break;
+
     // Logout
     case 'logout':
         Auth::logout();

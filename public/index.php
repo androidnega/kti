@@ -15,6 +15,9 @@ $url = strtolower($url);  // Make case-insensitive
 
 if (empty($url) || $url === 'home') {
     $controller->index();
+} elseif (strpos($url, 'program/') === 0) {
+    $slug = substr($url, strlen('program/'));
+    $controller->programDetail($slug);
 } elseif ($url === 'programs' || $url === 'departments') {
     $controller->programs();
 } elseif ($url === 'staff') {

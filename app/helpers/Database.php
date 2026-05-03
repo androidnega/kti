@@ -21,6 +21,7 @@ class Database {
 
             // Initialize database if it doesn't exist
             $this->initializeDatabase();
+            $this->migrateProgramsSchema();
         } catch (PDOException $e) {
             die('Database connection failed: ' . $e->getMessage());
         }
@@ -48,6 +49,45 @@ class Database {
             $sql = file_get_contents(ROOT_PATH . '/config/database.sql');
             $this->connection->exec($sql);
         }
+    }
+
+    /**
+     * Add program gallery columns and program_media table for existing SQLite DBs.
+     */
+    private function migrateProgramsSchema() {
+        $cols = $this->connection->query('PRAGMA table_info(programs)')->fetchAll(PDO::FETCH_COLUMN, 1);
+        if (!in_array('slug', $cols, true)) {
+            $this->connection->exec('ALTER TABLE programs ADD COLUMN slug TEXT');
+        }
+        if (!in_array('faculty', $cols, true)) {
+            $this->connection->exec('ALTER TABLE programs ADD COLUMN faculty TEXT');
+        }
+        if (!in_array('cover_image', $cols, true)) {
+            $this->connection->exec('ALTER TABLE programs ADD COLUMN cover_image TEXT');
+        }
+        if (!in_array('detail_content', $cols, true)) {
+            $this->connection->exec('ALTER TABLE programs ADD COLUMN detail_content TEXT');
+        }
+        if (!in_array('updated_at', $cols, true)) {
+            $this->connection->exec('ALTER TABLE programs ADD COLUMN updated_at DATETIME');
+        }
+
+        $this->connection->exec(
+            'CREATE TABLE IF NOT EXISTS program_media (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                program_id INTEGER NOT NULL,
+                media_type TEXT NOT NULL DEFAULT \'image\',
+                file_path TEXT,
+                external_url TEXT,
+                caption TEXT,
+                sort_order INTEGER NOT NULL DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (program_id) REFERENCES programs(id) ON DELETE CASCADE
+            )'
+        );
+        $this->connection->exec(
+            'CREATE INDEX IF NOT EXISTS idx_program_media_program ON program_media(program_id)'
+        );
     }
 
     public function query($sql, $params = []) {

@@ -27,6 +27,8 @@
             <thead class="bg-gray-50">
                 <tr class="border-b border-gray-200">
                     <th class="text-left py-3 px-4 font-semibold text-gray-600">Name</th>
+                    <th class="text-left py-3 px-4 font-semibold text-gray-600">Slug</th>
+                    <th class="text-left py-3 px-4 font-semibold text-gray-600">Faculty</th>
                     <th class="text-left py-3 px-4 font-semibold text-gray-600">Department</th>
                     <th class="text-left py-3 px-4 font-semibold text-gray-600">Description</th>
                     <th class="text-right py-3 px-4 font-semibold text-gray-600">Actions</th>
@@ -35,10 +37,11 @@
             <tbody class="divide-y divide-gray-100">
                 <?php if (empty($programs)): ?>
                 <tr>
-                    <td colspan="4" class="text-center py-8 text-gray-500 text-sm">No programs found. Add your first program.</td>
+                    <td colspan="6" class="text-center py-8 text-gray-500 text-sm">No programs found. Add your first program.</td>
                 </tr>
                 <?php else: ?>
                     <?php foreach ($programs as $program): ?>
+                    <?php $slug = trim((string) ($program['slug'] ?? '')); ?>
                     <tr class="hover:bg-gray-50">
                         <td class="py-3 px-4">
             <div class="flex items-center gap-2">
@@ -50,15 +53,31 @@
                 </div>
             </div>
         </td>
+                        <td class="py-3 px-4 text-gray-600 font-mono text-xs"><?= $slug !== '' ? htmlspecialchars($slug) : '—' ?></td>
+                        <td class="py-3 px-4 text-gray-600">
+                            <?php if (!empty($program['faculty'])): ?>
+                            <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-700">
+                                <?= htmlspecialchars($program['faculty']) ?>
+                            </span>
+                            <?php else: ?>
+                            <span class="text-gray-400">—</span>
+                            <?php endif; ?>
+                        </td>
                         <td class="py-3 px-4 text-gray-600">
                             <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-700">
                                 <i class="fa-solid fa-layer-group text-[10px] text-primary-500"></i>
-                                <?= htmlspecialchars($program['department']) ?>
+                                <?= htmlspecialchars($program['department'] ?? '') ?>
                             </span>
                         </td>
-                        <td class="py-3 px-4 text-gray-600 text-xs"><?= htmlspecialchars(strlen($program['description']) > 80 ? substr($program['description'], 0, 77) . '...' : $program['description']) ?></td>
+                        <td class="py-3 px-4 text-gray-600 text-xs"><?= htmlspecialchars(strlen($program['description'] ?? '') > 80 ? substr($program['description'], 0, 77) . '...' : ($program['description'] ?? '')) ?></td>
                         <td class="py-3 px-4 text-right">
-                            <div class="inline-flex items-center gap-2">
+                            <div class="inline-flex flex-wrap items-center justify-end gap-2">
+                                <?php if ($slug !== ''): ?>
+                                <a href="<?= htmlspecialchars(APP_URL) ?>?url=program/<?= rawurlencode($slug) ?>" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-xs font-medium text-secondary-600 hover:text-secondary-800">
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                    View on site
+                                </a>
+                                <?php endif; ?>
                                 <a href="<?= ADMIN_URL ?>?action=program_edit&id=<?= $program['id'] ?>" class="inline-flex items-center gap-1 text-xs font-medium text-primary-600 hover:text-primary-800">
                                     <i class="fa-solid fa-pen-to-square text-[11px]"></i>
                                     Edit

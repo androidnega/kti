@@ -17,24 +17,47 @@ class HomeController extends BaseController {
     }
 
     public function index() {
-        $programs = $this->programModel->all();
+        $programs = $this->programModel->allOrdered();
         $this->view('home', [
-            'programs' => array_slice($programs, 0, 3) // Show top 3 programs
+            'programs' => array_slice($programs, 0, 3),
         ]);
     }
 
     public function programs() {
-        $departments = $this->programModel->getAllDepartments();
-        $programsByDept = [];
-        
-        foreach ($departments as $dept) {
-            $deptName = $dept['department'];
-            $programsByDept[$deptName] = $this->programModel->getByDepartment($deptName);
+        $facultyRows = $this->programModel->getAllFaculties();
+        $programs = $this->programModel->allOrdered();
+        $programsByFaculty = [];
+
+        foreach ($programs as $program) {
+            $faculty = !empty($program['faculty']) ? $program['faculty'] : ($program['department'] ?? 'General');
+            if (!isset($programsByFaculty[$faculty])) {
+                $programsByFaculty[$faculty] = [];
+            }
+            $programsByFaculty[$faculty][] = $program;
         }
-        
+
         $this->view('programs', [
-            'departments' => $departments,
-            'programsByDept' => $programsByDept
+            'faculties' => $facultyRows,
+            'programsByFaculty' => $programsByFaculty,
+        ]);
+    }
+
+    public function programDetail($slug) {
+        $slug = trim((string) $slug);
+        $program = $this->programModel->findBySlug($slug);
+        if (!$program) {
+            http_response_code(404);
+            echo '<h1>Program not found</h1><p><a href="' . htmlspecialchars(APP_URL) . '?url=programs">Back to programs</a></p>';
+            return;
+        }
+
+        require_once APP_PATH . '/models/ProgramMedia.php';
+        $mediaModel = new ProgramMedia();
+        $media = $mediaModel->forProgram((int) $program['id']);
+
+        $this->view('program_detail', [
+            'program' => $program,
+            'media' => $media,
         ]);
     }
 
