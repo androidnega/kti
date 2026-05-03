@@ -126,7 +126,7 @@ class AdminController extends BaseController {
         $faculty = $this->sanitize($_POST['faculty'] ?? '');
         $description = $this->sanitize(ContentSanitizer::stripDataImageUris((string) ($_POST['description'] ?? '')));
         $detailRaw = trim(ContentSanitizer::stripDataImageUris((string) ($_POST['detail_content'] ?? '')));
-        $detailContent = htmlspecialchars($detailRaw, ENT_QUOTES, 'UTF-8');
+        $detailContent = ContentSanitizer::sanitizeProgramDetailHtml($detailRaw);
         $coverRaw = trim(ContentSanitizer::stripDataImageUris((string) ($_POST['cover_image'] ?? '')));
         $coverImage = $coverRaw !== '' ? htmlspecialchars(strip_tags($coverRaw), ENT_QUOTES, 'UTF-8') : '';
 

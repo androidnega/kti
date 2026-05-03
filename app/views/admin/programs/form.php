@@ -7,6 +7,7 @@ $media = $media ?? [];
 $slug = trim((string) ($program['slug'] ?? ''));
 $publicUrl = $slug !== '' ? (rtrim(APP_URL, '/') . '/?url=program/' . rawurlencode($slug)) : '';
 $isEdit = isset($program) && $programId > 0;
+$detailForQuill = htmlspecialchars_decode((string) ($program['detail_content'] ?? ''), ENT_QUOTES | (defined('ENT_HTML5') ? ENT_HTML5 : 0));
 ?>
 
 <!-- Toast -->
@@ -123,7 +124,11 @@ $isEdit = isset($program) && $programId > 0;
         </div>
         <div>
                         <label class="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-600 sm:text-sm sm:normal-case sm:tracking-normal">Detail page content</label>
-                        <textarea name="detail_content" rows="8" class="input w-full resize-y rounded-xl border-slate-200 px-4 py-3 text-sm leading-relaxed shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:min-h-[200px]" placeholder="Extra paragraphs on the department detail page (plain text)"><?= htmlspecialchars($program['detail_content'] ?? '') ?></textarea>
+                        <p class="mb-2 text-xs text-slate-500 sm:text-sm">Rich text: headings, bullets, numbered lists, quotes, links. Saved HTML is cleaned automatically for safety.</p>
+                        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm focus-within:ring-2 focus-within:ring-primary-500/25">
+                            <div id="program-detail-quill" class="min-h-[240px] [&_.ql-toolbar]:rounded-t-xl [&_.ql-toolbar]:border-0 [&_.ql-toolbar]:border-b [&_.ql-toolbar]:border-slate-200 [&_.ql-toolbar]:bg-slate-50 [&_.ql-container]:border-0 [&_.ql-editor]:min-h-[220px] [&_.ql-editor]:px-4 [&_.ql-editor]:py-4 [&_.ql-editor]:text-[15px] [&_.ql-editor]:leading-relaxed [&_.ql-editor_h2]:mb-2 [&_.ql-editor_h2]:mt-4 [&_.ql-editor_h2]:text-xl [&_.ql-editor_h2]:font-bold [&_.ql-editor_h3]:mb-2 [&_.ql-editor_h3]:mt-3 [&_.ql-editor_h3]:text-lg [&_.ql-editor_h3]:font-bold [&_.ql-editor_h4]:mb-1 [&_.ql-editor_h4]:mt-2 [&_.ql-editor_h4]:text-base [&_.ql-editor_h4]:font-bold [&_.ql-editor_blockquote]:border-l-4 [&_.ql-editor_blockquote]:border-primary-300 [&_.ql-editor_blockquote]:bg-slate-50 [&_.ql-editor_blockquote]:py-1 [&_.ql-editor_ul]:my-2 [&_.ql-editor_ol]:my-2"></div>
+                        </div>
+                        <textarea name="detail_content" id="program-detail-hidden" class="sr-only" tabindex="-1" aria-hidden="true"></textarea>
         </div>
 
                     <div class="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
@@ -146,7 +151,7 @@ $isEdit = isset($program) && $programId > 0;
             </p>
             <ul class="mt-2 list-inside list-disc space-y-1.5 text-xs leading-relaxed text-amber-900/90 sm:text-sm">
                 <li>Large photos are resized and compressed in your browser before upload, so the server gets a smaller JPEG (less memory errors). GIFs are unchanged.</li>
-                <li>Gallery images and videos show a live preview while uploading; they are stored as soon as each upload finishes—Save is only for the text fields above.</li>
+                <li>Gallery images and videos show a live preview while uploading; they are stored as soon as each upload finishes—Save is only for the text fields above (including the formatted detail editor).</li>
                 <li>Cover photo (if shown) uploads immediately too, or use “Set as cover” on a gallery image.</li>
                 <li>Large MP4 uploads may need a higher PHP <code class="rounded bg-amber-100/80 px-1">upload_max_filesize</code>.</li>
             </ul>
@@ -267,6 +272,8 @@ $isEdit = isset($program) && $programId > 0;
     </div>
 </div>
 
+<link rel="stylesheet" href="https://cdn.quilljs.com/1.3.7/quill.snow.css" crossorigin="anonymous">
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script>
 (function () {
@@ -274,6 +281,37 @@ $isEdit = isset($program) && $programId > 0;
     var ADMIN_API = <?= json_encode(ADMIN_INDEX_URL) ?>;
     var APP_URL_BASE = <?= json_encode(rtrim(APP_URL, '/')) ?>;
     var PROGRAM_ID = <?= (int) $programId ?>;
+    var PROGRAM_DETAIL_INITIAL = <?= json_encode($detailForQuill, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?>;
+
+    var quillHost = document.getElementById('program-detail-quill');
+    var quillHidden = document.getElementById('program-detail-hidden');
+    var programQuill = null;
+    if (quillHost && typeof Quill !== 'undefined') {
+        programQuill = new Quill('#program-detail-quill', {
+            theme: 'snow',
+            placeholder: 'Headings, bullet lists, numbered lists, quotes, bold, links…',
+            modules: {
+                toolbar: [
+                    [{ header: [2, 3, 4, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote'],
+                    [{ list: 'ordered' }, { list: 'bullet' }],
+                    [{ indent: '-1' }, { indent: '+1' }],
+                    ['link'],
+                    ['clean'],
+                ],
+            },
+        });
+        if (typeof PROGRAM_DETAIL_INITIAL === 'string' && PROGRAM_DETAIL_INITIAL.trim() !== '') {
+            programQuill.root.innerHTML = PROGRAM_DETAIL_INITIAL;
+        }
+        if (quillHidden) {
+            quillHidden.value = programQuill.root.innerHTML;
+        }
+        programQuill.on('text-change', function () {
+            if (quillHidden) quillHidden.value = programQuill.root.innerHTML;
+        });
+    }
 
     var toastEl = document.getElementById('admin-toast');
     function showToast(msg, isError) {
@@ -560,6 +598,13 @@ $isEdit = isset($program) && $programId > 0;
         mobileSave.addEventListener('click', function () {
             if (mainForm.requestSubmit) mainForm.requestSubmit();
             else mainForm.submit();
+        });
+    }
+    if (mainForm) {
+        mainForm.addEventListener('submit', function () {
+            if (programQuill && quillHidden) {
+                quillHidden.value = programQuill.root.innerHTML;
+            }
         });
     }
 

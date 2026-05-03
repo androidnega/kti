@@ -59,6 +59,7 @@ class HomeController extends BaseController {
             return;
         }
 
+        require_once APP_PATH . '/helpers/ContentSanitizer.php';
         require_once APP_PATH . '/models/ProgramMedia.php';
         $mediaModel = new ProgramMedia();
         $media = $mediaModel->forProgram((int) $program['id']);
