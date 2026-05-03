@@ -196,7 +196,7 @@
             $slug = trim((string) ($program['slug'] ?? ''));
             $cover = !empty($program['cover_image'])
                 ? rtrim(APP_URL, '/') . '/' . ltrim($program['cover_image'], '/')
-                : '';
+                : rtrim(APP_URL, '/') . '/assets/images/vocational.jpg';
             $cardClass = 'card hover:shadow-lg transition-shadow border border-gray-200';
             ?>
             <?php if ($slug !== ''): ?>
@@ -204,11 +204,9 @@
             <?php else: ?>
             <div class="<?= $cardClass ?>">
             <?php endif; ?>
-                <?php if ($cover !== ''): ?>
                 <div class="aspect-[16/10] w-full overflow-hidden rounded-lg bg-gray-100 mb-4 -mt-1">
                     <img src="<?= htmlspecialchars($cover) ?>" alt="<?= htmlspecialchars($program['name']) ?>" class="h-full w-full object-cover" loading="lazy">
                 </div>
-                <?php endif; ?>
                 <h3 class="text-xl font-semibold text-primary-600 mb-3"><?= htmlspecialchars($program['name']) ?></h3>
                 <p class="text-sm text-primary-500 mb-3 font-medium"><?= htmlspecialchars($program['department'] ?? '') ?></p>
                 <p class="text-gray-600 line-clamp-3"><?= htmlspecialchars($program['description'] ?? '') ?></p>

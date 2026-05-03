@@ -67,7 +67,7 @@ CREATE INDEX IF NOT EXISTS idx_program_media_program ON program_media(program_id
 
 -- Insert initial admin user (credentials should be changed in production)
 INSERT INTO users (name, email, password_hash, role) 
-VALUES ('admin', 'admin', '$2y$12$nPafwFSxEX.vEtQ2O70Sj.25gWchaC/1aeWV//uyGofzNyxjhfNzC', 'admin');
+VALUES ('admin', 'admin', '$2y$12$Ep4jHbD8Ju7loJj1QeiK9.gYzYS.nNwuNuTDJW0PE3BIK8jQfzbJq', 'admin');
 
 -- Insert homepage with real information
 INSERT INTO pages (slug, title, content) 

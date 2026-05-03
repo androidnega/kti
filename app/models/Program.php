@@ -61,4 +61,26 @@ class Program extends BaseModel {
             'SELECT * FROM programs ORDER BY faculty ASC, name ASC'
         );
     }
+
+    /**
+     * If cover_image is empty, use the first gallery image for this program (same folder / slug on disk).
+     *
+     * @param array $program by reference
+     */
+    public function enrichProgramCover(array &$program) {
+        if (!empty($program['cover_image'])) {
+            return;
+        }
+        $id = (int) ($program['id'] ?? 0);
+        if ($id < 1) {
+            return;
+        }
+        $row = $this->db->fetchOne(
+            "SELECT file_path FROM program_media WHERE program_id = ? AND media_type = 'image' AND file_path IS NOT NULL AND trim(file_path) != '' ORDER BY sort_order ASC, id ASC LIMIT 1",
+            [$id]
+        );
+        if ($row && !empty($row['file_path'])) {
+            $program['cover_image'] = $row['file_path'];
+        }
+    }
 }

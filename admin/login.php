@@ -10,8 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     
     if (Auth::login($username, $password)) {
-        // Redirect to unified dashboard route after successful login
-        header('Location: http://localhost/KTI/dashboard');
+        header('Location: ' . rtrim(ADMIN_URL, '/') . '/index.php');
         exit;
     } else {
         $error = 'Invalid email or password';
@@ -20,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Redirect if already logged in
 if (Auth::check()) {
-    header('Location: http://localhost/KTI/dashboard');
+    header('Location: ' . rtrim(ADMIN_URL, '/') . '/index.php');
     exit;
 }
 ?>

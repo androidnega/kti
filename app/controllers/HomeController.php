@@ -18,6 +18,10 @@ class HomeController extends BaseController {
 
     public function index() {
         $programs = $this->programModel->allOrdered();
+        foreach ($programs as &$p) {
+            $this->programModel->enrichProgramCover($p);
+        }
+        unset($p);
         $this->view('home', [
             'programs' => array_slice($programs, 0, 3),
         ]);
@@ -26,6 +30,10 @@ class HomeController extends BaseController {
     public function programs() {
         $facultyRows = $this->programModel->getAllFaculties();
         $programs = $this->programModel->allOrdered();
+        foreach ($programs as &$p) {
+            $this->programModel->enrichProgramCover($p);
+        }
+        unset($p);
         $programsByFaculty = [];
 
         foreach ($programs as $program) {
@@ -54,6 +62,7 @@ class HomeController extends BaseController {
         require_once APP_PATH . '/models/ProgramMedia.php';
         $mediaModel = new ProgramMedia();
         $media = $mediaModel->forProgram((int) $program['id']);
+        $this->programModel->enrichProgramCover($program);
 
         $this->view('program_detail', [
             'program' => $program,

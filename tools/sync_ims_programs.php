@@ -1,7 +1,9 @@
 #!/usr/bin/env php
 <?php
 /**
- * Upserts the six IMS department programs and imports / optimizes images from ims/<Department Folder>/.
+ * Upserts IMS-linked department programs and copies/optimizes images into the web tree:
+ *   public/uploads/programs/{slug}/*.jpg
+ * Images are matched by IMS folder name (exact match preferred, then fuzzy match to department).
  *
  * Usage (from project root):
  *   php tools/sync_ims_programs.php
@@ -13,6 +15,65 @@ require_once APP_PATH . '/helpers/Database.php';
 require_once APP_PATH . '/helpers/ImageProcessor.php';
 require_once APP_PATH . '/models/Program.php';
 require_once APP_PATH . '/models/ProgramMedia.php';
+
+/**
+ * @param string $folderName e.g. "Electrical Engineering Technology Department"
+ */
+function ims_folder_normalize($folderName) {
+    $s = strtolower(trim($folderName));
+    $s = preg_replace('/\bdepartment\b/u', '', $s);
+    $s = preg_replace('/[^a-z0-9]+/u', '', $s);
+    return $s;
+}
+
+/**
+ * Map actual directory names under ims/ to department definitions.
+ *
+ * @param string $imsRoot
+ * @param array<string,array> $definitions canonical folder name => def
+ * @return array<string,array> disk folder basename => def
+ */
+function resolve_ims_folder_map($imsRoot, array $definitions) {
+    $map = [];
+    foreach ($definitions as $expectedFolder => $def) {
+        $path = $imsRoot . '/' . $expectedFolder;
+        if (is_dir($path)) {
+            $map[$expectedFolder] = $def;
+        }
+    }
+
+    $dirs = glob($imsRoot . '/*', GLOB_ONLYDIR) ?: [];
+    foreach ($dirs as $full) {
+        $disk = basename($full);
+        if (isset($map[$disk])) {
+            continue;
+        }
+        $normDisk = ims_folder_normalize($disk);
+        $best = null;
+        $bestPct = 0.0;
+        foreach ($definitions as $expectedFolder => $def) {
+            $normExp = ims_folder_normalize($expectedFolder);
+            if ($normDisk === $normExp) {
+                $best = $def;
+                $bestPct = 100.0;
+                break;
+            }
+            similar_text($normDisk, $normExp, $pct);
+            if ($pct > $bestPct) {
+                $bestPct = $pct;
+                $best = $def;
+            }
+        }
+        if ($best !== null && $bestPct >= 42.0) {
+            $map[$disk] = $best;
+            fwrite(STDERR, "Matched IMS folder \"{$disk}\" → slug {$best['slug']} (" . round($bestPct, 1) . "% name similarity)\n");
+        } else {
+            fwrite(STDERR, "Unmatched IMS folder (add or rename): {$disk}\n");
+        }
+    }
+
+    return $map;
+}
 
 $prune = in_array('--prune-legacy', $argv, true);
 
@@ -83,10 +144,16 @@ if ($prune) {
     fwrite(STDERR, "Pruned programs not in canonical IMS list.\n");
 }
 
-foreach ($definitions as $folder => $def) {
-    $dir = $imsRoot . '/' . $folder;
+if (!is_dir($imsRoot)) {
+    fwrite(STDERR, "Missing ims/ root: {$imsRoot}\n");
+    exit(1);
+}
+
+$folderMap = resolve_ims_folder_map($imsRoot, $definitions);
+
+foreach ($folderMap as $diskFolder => $def) {
+    $dir = $imsRoot . '/' . $diskFolder;
     if (!is_dir($dir)) {
-        fwrite(STDERR, "Skip missing folder: {$folder}\n");
         continue;
     }
 
@@ -104,11 +171,11 @@ foreach ($definitions as $folder => $def) {
     if ($row) {
         $programModel->update($row['id'], $payload);
         $programId = (int) $row['id'];
-        fwrite(STDERR, "Updated program #{$programId} {$slug}\n");
+        fwrite(STDERR, "Updated program #{$programId} {$slug} (from folder: {$diskFolder})\n");
     } else {
         $payload['created_at'] = gmdate('Y-m-d H:i:s');
         $programId = (int) $programModel->create($payload);
-        fwrite(STDERR, "Created program #{$programId} {$slug}\n");
+        fwrite(STDERR, "Created program #{$programId} {$slug} (from folder: {$diskFolder})\n");
     }
 
     $outDir = PROGRAM_UPLOAD_PATH . '/' . $slug;
@@ -138,7 +205,6 @@ foreach ($definitions as $folder => $def) {
     sort($files);
 
     $sort = 0;
-    $firstRel = null;
     foreach ($files as $src) {
         $base = preg_replace('/[^a-z0-9]+/i', '-', strtolower(pathinfo($src, PATHINFO_FILENAME)));
         $base = trim($base, '-') ?: 'photo';
@@ -157,9 +223,6 @@ foreach ($definitions as $folder => $def) {
         }
 
         $rel = 'uploads/programs/' . $slug . '/' . $destName;
-        if ($firstRel === null) {
-            $firstRel = $rel;
-        }
 
         if (isset($existingFiles[$rel])) {
             continue;
@@ -175,10 +238,17 @@ foreach ($definitions as $folder => $def) {
         ]);
     }
 
-    $programRow = $programModel->find($programId);
-    if ($programRow && empty($programRow['cover_image']) && $firstRel) {
-        $programModel->update($programId, ['cover_image' => $firstRel]);
+    $st = $db->prepare(
+        "SELECT file_path FROM program_media WHERE program_id = ? AND media_type = 'image' AND file_path IS NOT NULL AND trim(file_path) != '' ORDER BY sort_order ASC, id ASC LIMIT 1"
+    );
+    $st->execute([$programId]);
+    $coverRow = $st->fetch(PDO::FETCH_ASSOC);
+    if ($coverRow && !empty($coverRow['file_path'])) {
+        $programModel->update($programId, [
+            'cover_image' => $coverRow['file_path'],
+            'updated_at' => gmdate('Y-m-d H:i:s'),
+        ]);
     }
 }
 
-fwrite(STDERR, "Done.\n");
+fwrite(STDERR, "Done. Web images live under: " . PROGRAM_UPLOAD_PATH . " (URL path uploads/programs/{slug}/)\n");
