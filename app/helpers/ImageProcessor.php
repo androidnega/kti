@@ -15,6 +15,10 @@ class ImageProcessor {
         }
         if (PHP_VERSION_ID < 80000 && is_resource($im) && get_resource_type($im) === 'gd') {
             imagedestroy($im);
+            return;
+        }
+        if (PHP_VERSION_ID >= 80000 && $im instanceof \GdImage) {
+            @imagedestroy($im);
         }
     }
 
@@ -33,50 +37,69 @@ class ImageProcessor {
             return @copy($srcPath, $destPath);
         }
 
-        $img = self::loadImage($srcPath);
-        if ($img === false) {
-            return false;
+        $meta = @getimagesize($srcPath);
+        $px = ($meta && isset($meta[0], $meta[1])) ? (int) $meta[0] * (int) $meta[1] : 0;
+        $prevMem = ini_get('memory_limit');
+        $needMem = '512M';
+        if ($px > 18000000) {
+            $needMem = '768M';
         }
+        if ($px > 35000000) {
+            $needMem = '1024M';
+        }
+        @ini_set('memory_limit', $needMem);
+        @ini_set('max_execution_time', '180');
 
-        if (function_exists('imagepalettetotruecolor')) {
-            @imagepalettetotruecolor($img);
-        }
+        try {
+            $img = self::loadImage($srcPath);
+            if ($img === false) {
+                return false;
+            }
 
-        $w = imagesx($img);
-        $h = imagesy($img);
-        if ($w < 1 || $h < 1) {
-            self::freeImage($img);
-            return false;
-        }
+            if (function_exists('imagepalettetotruecolor')) {
+                @imagepalettetotruecolor($img);
+            }
 
-        $gd = $img;
-        $maxEdge = 2200;
-        if ($w > $maxEdge || $h > $maxEdge) {
-            $scale = min($maxEdge / $w, $maxEdge / $h);
-            $nw = max(1, (int) round($w * $scale));
-            $nh = max(1, (int) round($h * $scale));
-            $resized = imagecreatetruecolor($nw, $nh);
-            imagealphablending($resized, true);
-            imagecopyresampled($resized, $gd, 0, 0, 0, 0, $nw, $nh, $w, $h);
-            self::freeImage($gd);
-            $gd = $resized;
-            $w = $nw;
-            $h = $nh;
-        }
+            $w = imagesx($img);
+            $h = imagesy($img);
+            if ($w < 1 || $h < 1) {
+                self::freeImage($img);
+                return false;
+            }
 
-        $jpegBytes = self::buildJpegUnderMaxBytes($gd, $w, $h, $maxBytes);
-        if ($gd !== null && $gd !== false) {
-            self::freeImage($gd);
-        }
+            $gd = $img;
+            $maxEdge = 2000;
+            if ($w > $maxEdge || $h > $maxEdge) {
+                $scale = min($maxEdge / $w, $maxEdge / $h);
+                $nw = max(1, (int) round($w * $scale));
+                $nh = max(1, (int) round($h * $scale));
+                $resized = imagecreatetruecolor($nw, $nh);
+                imagealphablending($resized, true);
+                imagecopyresampled($resized, $gd, 0, 0, 0, 0, $nw, $nh, $w, $h);
+                self::freeImage($gd);
+                $gd = $resized;
+                $w = $nw;
+                $h = $nh;
+            }
 
-        if ($jpegBytes === false || $jpegBytes === null || $jpegBytes === '') {
-            return false;
+            $jpegBytes = self::buildJpegUnderMaxBytes($gd, $w, $h, $maxBytes);
+            if ($gd !== null && $gd !== false) {
+                self::freeImage($gd);
+            }
+
+            if ($jpegBytes === false || $jpegBytes === null || $jpegBytes === '') {
+                return false;
+            }
+            $dir = dirname($destPath);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+            $ok = file_put_contents($destPath, $jpegBytes) !== false;
+            unset($jpegBytes);
+            return $ok;
+        } finally {
+            @ini_set('memory_limit', $prevMem);
         }
-        $dir = dirname($destPath);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-        return file_put_contents($destPath, $jpegBytes) !== false;
     }
 
     /**
@@ -107,11 +130,19 @@ class ImageProcessor {
                 }
                 if ($len < $bestLen) {
                     $bestLen = $len;
+                    if ($best !== null) {
+                        unset($best);
+                    }
                     $best = $try;
+                } else {
+                    unset($try);
                 }
             }
 
             $chosen = $best;
+            if ($best !== null) {
+                unset($best);
+            }
 
             if ($chosen !== null && strlen($chosen) <= $maxBytes) {
                 self::freeImage($gd);
