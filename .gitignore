@@ -14,3 +14,7 @@ public/uploads/videos/
 
 # Local IMS source folders (run tools/sync_ims_programs.php locally or on server)
 ims/
+
+# Local SQL dumps (may contain secrets; do not commit)
+ttu_doc_request.sql
+ttu_scale.sql
