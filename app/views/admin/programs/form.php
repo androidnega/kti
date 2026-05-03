@@ -145,6 +145,7 @@ $isEdit = isset($program) && $programId > 0;
                 Tips
             </p>
             <ul class="mt-2 list-inside list-disc space-y-1.5 text-xs leading-relaxed text-amber-900/90 sm:text-sm">
+                <li>Large photos are resized and compressed in your browser before upload, so the server gets a smaller JPEG (less memory errors). GIFs are unchanged.</li>
                 <li>Gallery images and videos show a live preview while uploading; they are stored as soon as each upload finishes—Save is only for the text fields above.</li>
                 <li>Cover photo (if shown) uploads immediately too, or use “Set as cover” on a gallery image.</li>
                 <li>Large MP4 uploads may need a higher PHP <code class="rounded bg-amber-100/80 px-1">upload_max_filesize</code>.</li>
@@ -311,6 +312,94 @@ $isEdit = isset($program) && $programId > 0;
 
     function escAttr(s) {
         return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /**
+     * Resize + JPEG encode in the browser so the server receives a smaller file (less PHP/GD memory).
+     * @param {File} file
+     * @param {function(number)|undefined} onPrepProgress 0–100 while preparing (decode, canvas, encode)
+     */
+    function compressImageForUpload(file, onPrepProgress) {
+        var mime = (file.type || '').toLowerCase();
+        if (!mime || mime.indexOf('image/') !== 0) {
+            return Promise.resolve(file);
+        }
+        if (mime === 'image/gif' || mime === 'image/svg+xml') {
+            return Promise.resolve(file);
+        }
+        if (file.size < 400000 && mime === 'image/jpeg') {
+            return Promise.resolve(file);
+        }
+        function prep(p) {
+            if (typeof onPrepProgress === 'function') onPrepProgress(Math.max(0, Math.min(100, p)));
+        }
+        prep(5);
+        return new Promise(function (resolve) {
+            var url = URL.createObjectURL(file);
+            var img = new Image();
+            img.decoding = 'async';
+            img.onload = function () {
+                prep(18);
+                try { URL.revokeObjectURL(url); } catch (e0) {}
+                var w = img.naturalWidth || img.width;
+                var h = img.naturalHeight || img.height;
+                if (w < 1 || h < 1) {
+                    resolve(file);
+                    return;
+                }
+                var maxEdge = 1920;
+                var scale = Math.min(1, maxEdge / Math.max(w, h));
+                var nw = Math.max(1, Math.round(w * scale));
+                var nh = Math.max(1, Math.round(h * scale));
+                var canvas = document.createElement('canvas');
+                canvas.width = nw;
+                canvas.height = nh;
+                var ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    resolve(file);
+                    return;
+                }
+                if (mime === 'image/png' || mime === 'image/webp') {
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, nw, nh);
+                }
+                try {
+                    ctx.drawImage(img, 0, 0, nw, nh);
+                } catch (e1) {
+                    resolve(file);
+                    return;
+                }
+                prep(35);
+                var maxBytes = 1200000;
+                var q = 0.85;
+                function tryQuality() {
+                    canvas.toBlob(function (blob) {
+                        if (!blob) {
+                            prep(100);
+                            resolve(file);
+                            return;
+                        }
+                        prep(35 + Math.round((0.85 - q) / 0.37 * 50));
+                        if (blob.size <= maxBytes || q <= 0.48) {
+                            prep(100);
+                            var base = (file.name && file.name.replace(/\.[^.]+$/, '')) || 'photo';
+                            var out = new File([blob], base + '.jpg', { type: 'image/jpeg', lastModified: Date.now() });
+                            resolve(out);
+                            return;
+                        }
+                        q -= 0.06;
+                        tryQuality();
+                    }, 'image/jpeg', q);
+                }
+                tryQuality();
+            };
+            img.onerror = function () {
+                try { URL.revokeObjectURL(url); } catch (e2) {}
+                prep(100);
+                resolve(file);
+            };
+            img.src = url;
+        });
     }
 
     function removePendingRow(li) {
@@ -517,11 +606,26 @@ $isEdit = isset($program) && $programId > 0;
     }
 
     function uploadOneFile(action, file, onProgress) {
-        var fd = new FormData();
-        fd.append('program_id', String(PROGRAM_ID));
-        fd.append('file', file);
-        var url = ADMIN_API + '?action=' + encodeURIComponent(action) + '&program_id=' + encodeURIComponent(String(PROGRAM_ID));
-        return xhrUploadWithJson(url, fd, onProgress);
+        function doXhr(uploadFile, prog) {
+            var fd = new FormData();
+            fd.append('program_id', String(PROGRAM_ID));
+            fd.append('file', uploadFile);
+            var url = ADMIN_API + '?action=' + encodeURIComponent(action) + '&program_id=' + encodeURIComponent(String(PROGRAM_ID));
+            return xhrUploadWithJson(url, fd, prog || onProgress);
+        }
+        if (action === 'program_video_upload') {
+            return doXhr(file);
+        }
+        if (action === 'program_media_upload') {
+            return compressImageForUpload(file, function (prep) {
+                if (onProgress) onProgress(Math.round(prep * 0.42));
+            }).then(function (readyFile) {
+                return doXhr(readyFile, function (pct) {
+                    if (onProgress) onProgress(42 + Math.round(pct * 0.58));
+                });
+            });
+        }
+        return doXhr(file);
     }
 
     function uploadFiles(action, files, onEach) {
@@ -676,52 +780,56 @@ $isEdit = isset($program) && $programId > 0;
                 if (pctBar) pctBar.style.width = (typeof pct === 'number' ? pct : 0) + '%';
             }
             setCoverPct(0);
-            var fd = new FormData();
-            fd.append('program_id', String(PROGRAM_ID));
-            fd.append('file', file);
             var coverUrl = ADMIN_API + '?action=program_cover_upload&program_id=' + encodeURIComponent(String(PROGRAM_ID));
-            xhrUploadWithJson(coverUrl, fd, setCoverPct)
-                .then(function (j) {
-                    if (localUrl) {
-                        try { URL.revokeObjectURL(localUrl); } catch (e2) {}
-                    }
-                    if (coverUploading) {
-                        coverUploading.classList.add('hidden');
-                        coverUploading.classList.remove('flex', 'flex-col');
-                    }
-                    if (coverPathField && j.file_path) coverPathField.value = j.file_path;
-                    if (coverPreviewImg && j.url) {
-                        coverPreviewImg.src = j.url;
-                        coverPreviewImg.classList.remove('hidden');
-                    }
-                    if (coverPreviewEmpty) coverPreviewEmpty.classList.add('hidden');
-                    showToast('Cover updated');
-                })
-                .catch(function (err) {
-                    if (localUrl) {
-                        try { URL.revokeObjectURL(localUrl); } catch (e3) {}
-                    }
-                    if (coverUploading) {
-                        coverUploading.classList.add('hidden');
-                        coverUploading.classList.remove('flex', 'flex-col');
-                    }
-                    setCoverPct(0);
-                    var prevPath = coverPathField && coverPathField.value ? coverPathField.value.trim() : '';
-                    if (coverPreviewImg) {
-                        if (prevPath) {
-                            coverPreviewImg.src = APP_URL_BASE + '/' + prevPath.replace(/^\//, '');
-                            coverPreviewImg.classList.remove('hidden');
-                        } else {
-                            coverPreviewImg.classList.add('hidden');
-                            coverPreviewImg.removeAttribute('src');
-                        }
-                    }
-                    if (coverPreviewEmpty) {
-                        if (prevPath) coverPreviewEmpty.classList.add('hidden');
-                        else coverPreviewEmpty.classList.remove('hidden');
-                    }
-                    showToast(err.message || String(err), true);
+            compressImageForUpload(file, function (prep) {
+                setCoverPct(Math.round(prep * 0.38));
+            }).then(function (readyFile) {
+                var fd = new FormData();
+                fd.append('program_id', String(PROGRAM_ID));
+                fd.append('file', readyFile);
+                return xhrUploadWithJson(coverUrl, fd, function (pct) {
+                    setCoverPct(38 + Math.round(pct * 0.62));
                 });
+            }).then(function (j) {
+                if (localUrl) {
+                    try { URL.revokeObjectURL(localUrl); } catch (e2) {}
+                }
+                if (coverUploading) {
+                    coverUploading.classList.add('hidden');
+                    coverUploading.classList.remove('flex', 'flex-col');
+                }
+                if (coverPathField && j.file_path) coverPathField.value = j.file_path;
+                if (coverPreviewImg && j.url) {
+                    coverPreviewImg.src = j.url;
+                    coverPreviewImg.classList.remove('hidden');
+                }
+                if (coverPreviewEmpty) coverPreviewEmpty.classList.add('hidden');
+                showToast('Cover updated');
+            }).catch(function (err) {
+                if (localUrl) {
+                    try { URL.revokeObjectURL(localUrl); } catch (e3) {}
+                }
+                if (coverUploading) {
+                    coverUploading.classList.add('hidden');
+                    coverUploading.classList.remove('flex', 'flex-col');
+                }
+                setCoverPct(0);
+                var prevPath = coverPathField && coverPathField.value ? coverPathField.value.trim() : '';
+                if (coverPreviewImg) {
+                    if (prevPath) {
+                        coverPreviewImg.src = APP_URL_BASE + '/' + prevPath.replace(/^\//, '');
+                        coverPreviewImg.classList.remove('hidden');
+                    } else {
+                        coverPreviewImg.classList.add('hidden');
+                        coverPreviewImg.removeAttribute('src');
+                    }
+                }
+                if (coverPreviewEmpty) {
+                    if (prevPath) coverPreviewEmpty.classList.add('hidden');
+                    else coverPreviewEmpty.classList.remove('hidden');
+                }
+                showToast(err.message || String(err), true);
+            });
         });
     }
 })();
