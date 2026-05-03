@@ -26,6 +26,7 @@
         <table class="w-full text-sm">
             <thead class="bg-gray-50">
                 <tr class="border-b border-gray-200">
+                    <th class="text-left py-3 px-4 font-semibold text-gray-600 w-14"></th>
                     <th class="text-left py-3 px-4 font-semibold text-gray-600">Name</th>
                     <th class="text-left py-3 px-4 font-semibold text-gray-600">Slug</th>
                     <th class="text-left py-3 px-4 font-semibold text-gray-600">Faculty</th>
@@ -37,21 +38,27 @@
             <tbody class="divide-y divide-gray-100">
                 <?php if (empty($programs)): ?>
                 <tr>
-                    <td colspan="6" class="text-center py-8 text-gray-500 text-sm">No programs found. Add your first program.</td>
+                    <td colspan="7" class="text-center py-8 text-gray-500 text-sm">No programs found. Add your first program.</td>
                 </tr>
                 <?php else: ?>
                     <?php foreach ($programs as $program): ?>
-                    <?php $slug = trim((string) ($program['slug'] ?? '')); ?>
+                    <?php
+                    $slug = trim((string) ($program['slug'] ?? ''));
+                    $coverPath = trim((string) ($program['cover_image'] ?? ''));
+                    $coverThumb = $coverPath !== '' ? rtrim(APP_URL, '/') . '/' . ltrim($coverPath, '/') : '';
+                    ?>
                     <tr class="hover:bg-gray-50">
+                        <td class="py-3 px-4 align-middle">
+                            <?php if ($coverThumb !== ''): ?>
+                            <img src="<?= htmlspecialchars($coverThumb) ?>" alt="" class="h-10 w-10 rounded-lg border border-gray-200 object-cover" width="40" height="40" loading="lazy">
+                            <?php else: ?>
+                            <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-100 bg-primary-50 text-primary-700 text-[10px] font-bold uppercase" title="No cover yet"><?= strtoupper(substr((string) ($program['name'] ?? '?'), 0, 2)) ?></div>
+                            <?php endif; ?>
+                        </td>
                         <td class="py-3 px-4">
-            <div class="flex items-center gap-2">
-                <div class="flex h-8 w-8 items-center justify-center rounded bg-primary-50 text-primary-600 text-xs font-semibold uppercase">
-                    <?= strtoupper(substr($program['name'], 0, 2)) ?>
-                </div>
-                <div class="flex flex-col">
+            <div class="flex flex-col">
                     <span class="font-medium text-gray-900"><?= htmlspecialchars($program['name']) ?></span>
                 </div>
-            </div>
         </td>
                         <td class="py-3 px-4 text-gray-600 font-mono text-xs"><?= $slug !== '' ? htmlspecialchars($slug) : '—' ?></td>
                         <td class="py-3 px-4 text-gray-600">

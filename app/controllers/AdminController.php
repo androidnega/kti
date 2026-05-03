@@ -101,11 +101,18 @@ class AdminController extends BaseController {
     // Programs Management
     public function programs() {
         $programs = $this->programModel->allOrdered();
+        foreach ($programs as &$row) {
+            $this->programModel->enrichProgramCover($row);
+        }
+        unset($row);
         $this->view('admin/programs/index', ['programs' => $programs]);
     }
 
     public function programForm($id = null) {
         $program = $id ? $this->programModel->find($id) : null;
+        if ($program) {
+            $this->programModel->enrichProgramCover($program);
+        }
         $media = [];
         if ($program) {
             $media = $this->programMediaModel->forProgram((int) $program['id']);
@@ -202,6 +209,44 @@ class AdminController extends BaseController {
         $this->json([
             'ok' => true,
             'id' => $mid,
+            'file_path' => $webPath,
+            'url' => rtrim(APP_URL, '/') . '/' . $webPath,
+        ]);
+    }
+
+    public function programCoverUpload() {
+        $programId = (int) ($_POST['program_id'] ?? $_GET['program_id'] ?? 0);
+        if ($programId < 1 || !$this->programModel->find($programId)) {
+            $this->json(['ok' => false, 'error' => 'Invalid program'], 400);
+        }
+        if (empty($_FILES['file']) || !is_uploaded_file($_FILES['file']['tmp_name'])) {
+            $this->json(['ok' => false, 'error' => 'No file uploaded'], 400);
+        }
+
+        $tmp = $_FILES['file']['tmp_name'];
+        if (@getimagesize($tmp) === false) {
+            $this->json(['ok' => false, 'error' => 'Not a valid image'], 400);
+        }
+
+        if (!is_dir(PROGRAM_UPLOAD_PATH)) {
+            mkdir(PROGRAM_UPLOAD_PATH, 0755, true);
+        }
+
+        $basename = 'p' . $programId . '_cover_' . bin2hex(random_bytes(5)) . '.jpg';
+        $absDest = rtrim(PROGRAM_UPLOAD_PATH, '/') . '/' . $basename;
+        if (!ImageProcessor::toJpegMaxBytes($tmp, $absDest)) {
+            $this->json(['ok' => false, 'error' => 'Could not process image'], 500);
+        }
+
+        $webPath = 'uploads/programs/' . $basename;
+        $now = gmdate('Y-m-d H:i:s');
+        $this->programModel->update($programId, [
+            'cover_image' => $webPath,
+            'updated_at' => $now,
+        ]);
+
+        $this->json([
+            'ok' => true,
             'file_path' => $webPath,
             'url' => rtrim(APP_URL, '/') . '/' . $webPath,
         ]);

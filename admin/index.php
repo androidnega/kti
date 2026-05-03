@@ -73,6 +73,9 @@ switch ($action) {
     case 'program_media_upload':
         $controller->programMediaUpload();
         break;
+    case 'program_cover_upload':
+        $controller->programCoverUpload();
+        break;
     case 'program_video_upload':
         $controller->programVideoUpload();
         break;
