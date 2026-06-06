@@ -277,25 +277,67 @@ $slideCount = count($heroSlides);
     </div>
 </section>
 
-<!-- Impact in Numbers (Moved from Footer/History) -->
-<section class="py-16 bg-primary-900 text-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div class="p-6 border border-white/10 rounded-lg">
-                <div class="text-4xl font-bold text-accent-400 mb-2">2,698</div>
-                <div class="text-sm text-primary-200">Total Students</div>
+<!-- Kikam at a glance -->
+<section class="bg-gradient-to-br from-slate-50 via-white to-primary-50 py-16 sm:py-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center">
+            <span class="inline-flex items-center gap-2 rounded-full bg-accent-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-700 sm:text-xs">
+                <span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>
+                Kikam at a glance
+            </span>
+            <h2 class="mt-4 text-3xl font-bold tracking-tight text-primary-900 sm:text-4xl">Six decades of skilled training, in numbers</h2>
+            <p class="mt-3 text-base leading-relaxed text-slate-600 sm:text-lg">
+                Established in 1963, Kikam Technical Institute continues to shape Ghana's next generation of artisans, technicians and engineers.
+            </p>
+        </div>
+
+        <div class="mt-12 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+            <div class="group relative overflow-hidden rounded-2xl bg-white p-6 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:ring-primary-300 hover:shadow-md sm:p-7">
+                <div class="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-accent-100/70 transition group-hover:scale-125" aria-hidden="true"></div>
+                <div class="relative">
+                    <div class="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary-100 text-primary-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div class="text-3xl font-extrabold tracking-tight text-primary-900 sm:text-4xl">62<span class="text-accent-500">+</span></div>
+                    <div class="mt-1 text-sm font-semibold text-slate-700">Years of impact</div>
+                    <p class="mt-1 text-xs text-slate-500">Training Ghana's workforce since 1963</p>
+                </div>
             </div>
-             <div class="p-6 border border-white/10 rounded-lg">
-                <div class="text-4xl font-bold text-accent-400 mb-2">60</div>
-                <div class="text-sm text-primary-200">Teaching Staff</div>
+
+            <div class="group relative overflow-hidden rounded-2xl bg-white p-6 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:ring-primary-300 hover:shadow-md sm:p-7">
+                <div class="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-primary-100/70 transition group-hover:scale-125" aria-hidden="true"></div>
+                <div class="relative">
+                    <div class="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent-100 text-accent-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
+                    </div>
+                    <div class="text-3xl font-extrabold tracking-tight text-primary-900 sm:text-4xl">2,698</div>
+                    <div class="mt-1 text-sm font-semibold text-slate-700">Students enrolled</div>
+                    <p class="mt-1 text-xs text-slate-500">Across all programmes this year</p>
+                </div>
             </div>
-             <div class="p-6 border border-white/10 rounded-lg">
-                <div class="text-4xl font-bold text-accent-400 mb-2">32</div>
-                <div class="text-sm text-primary-200">Non-Teaching Staff</div>
+
+            <div class="group relative overflow-hidden rounded-2xl bg-white p-6 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:ring-primary-300 hover:shadow-md sm:p-7">
+                <div class="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-accent-100/70 transition group-hover:scale-125" aria-hidden="true"></div>
+                <div class="relative">
+                    <div class="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary-100 text-primary-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                    </div>
+                    <div class="text-3xl font-extrabold tracking-tight text-primary-900 sm:text-4xl">92</div>
+                    <div class="mt-1 text-sm font-semibold text-slate-700">Faculty &amp; staff</div>
+                    <p class="mt-1 text-xs text-slate-500">60 teaching, 32 support</p>
+                </div>
             </div>
-             <div class="p-6 border border-white/10 rounded-lg">
-                <div class="text-4xl font-bold text-accent-400 mb-2">12+</div>
-                <div class="text-sm text-primary-200">Departments</div>
+
+            <div class="group relative overflow-hidden rounded-2xl bg-white p-6 ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:ring-primary-300 hover:shadow-md sm:p-7">
+                <div class="absolute -right-4 -top-4 h-20 w-20 rounded-full bg-primary-100/70 transition group-hover:scale-125" aria-hidden="true"></div>
+                <div class="relative">
+                    <div class="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-accent-100 text-accent-700">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    </div>
+                    <div class="text-3xl font-extrabold tracking-tight text-primary-900 sm:text-4xl">12<span class="text-accent-500">+</span></div>
+                    <div class="mt-1 text-sm font-semibold text-slate-700">Trade departments</div>
+                    <p class="mt-1 text-xs text-slate-500">From welding to fashion design</p>
+                </div>
             </div>
         </div>
     </div>
