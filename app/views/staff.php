@@ -27,7 +27,7 @@
             </p>
         </div>
 
-        <div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10 lg:grid-cols-3">
+        <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-6 md:gap-8">
             <?php
             $leaders = [
                 [
@@ -52,13 +52,13 @@
             foreach ($leaders as $leader):
                 $src = rtrim(APP_URL, '/') . '/' . ltrim($leader['image'], '/');
             ?>
-            <article class="group mx-auto w-full max-w-sm text-center sm:max-w-none">
-                <div class="relative aspect-[3/4] overflow-hidden rounded-2xl bg-slate-100 shadow-xl ring-1 ring-black/5">
+            <article class="group mx-auto w-full max-w-[14rem] text-center sm:max-w-[16rem]">
+                <div class="relative aspect-[3/4] overflow-hidden rounded-xl bg-slate-100 shadow-md ring-1 ring-black/5">
                     <img src="<?= htmlspecialchars($src) ?>" alt="<?= htmlspecialchars($leader['alt']) ?>" class="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]" loading="lazy" decoding="async">
                 </div>
-                <div class="mt-5">
-                    <h3 class="text-xl font-bold text-primary-900 sm:text-2xl"><?= htmlspecialchars($leader['name']) ?></h3>
-                    <p class="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-accent-700 sm:text-sm">
+                <div class="mt-4">
+                    <h3 class="text-base font-bold text-primary-900 sm:text-lg"><?= htmlspecialchars($leader['name']) ?></h3>
+                    <p class="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-accent-700 sm:text-xs">
                         <?= htmlspecialchars($leader['role']) ?>
                     </p>
                 </div>
