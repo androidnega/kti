@@ -13,39 +13,60 @@
     </div>
 </section>
 
-<!-- Principal Feature -->
+<!-- Leadership Feature -->
 <section class="border-b border-slate-200 bg-white py-12 sm:py-16">
     <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 items-center gap-8 md:grid-cols-12 md:gap-10 lg:gap-14">
-            <div class="md:col-span-5 lg:col-span-4">
-                <div class="relative mx-auto w-full max-w-xs sm:max-w-sm md:max-w-none">
-                    <div class="absolute -inset-3 hidden rounded-3xl bg-gradient-to-br from-accent-200/60 to-primary-200/40 blur-xl md:block" aria-hidden="true"></div>
-                    <div class="relative aspect-[3/4] overflow-hidden rounded-2xl bg-slate-100 shadow-xl ring-1 ring-black/5">
-                        <img src="<?= APP_URL ?>/assets/images/principal.jpg" alt="Portrait of the Principal of Kikam Technical Institute" class="h-full w-full object-cover object-center" loading="lazy" decoding="async">
-                    </div>
+        <div class="text-center">
+            <span class="inline-flex items-center gap-2 rounded-full bg-accent-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-700 sm:text-xs">
+                <span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>
+                Leadership
+            </span>
+            <h2 class="mt-4 text-3xl font-bold leading-tight tracking-tight text-primary-900 sm:text-4xl">Meet our leadership</h2>
+            <p class="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
+                Guided by the values of <span class="font-semibold text-primary-900">Leadership, Integrity and Excellence</span>, our leadership team keeps Kikam focused on delivering practical training and shaping confident, work-ready students.
+            </p>
+        </div>
+
+        <div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10">
+            <?php
+            $leaders = [
+                [
+                    'name' => 'Mr. Emmanuel A. Anomah',
+                    'role' => 'Principal',
+                    'image' => 'assets/images/principal.jpg',
+                    'alt' => 'Portrait of Mr. Emmanuel A. Anomah, Principal',
+                ],
+                [
+                    'name' => 'Vice Principal, Academics',
+                    'role' => 'Academics',
+                    'image' => 'assets/images/vp-academics.jpg',
+                    'alt' => 'Portrait of the Vice Principal, Academics',
+                ],
+            ];
+            foreach ($leaders as $leader):
+                $src = rtrim(APP_URL, '/') . '/' . ltrim($leader['image'], '/');
+            ?>
+            <article class="group mx-auto w-full max-w-sm text-center sm:max-w-none">
+                <div class="relative aspect-[3/4] overflow-hidden rounded-2xl bg-slate-100 shadow-xl ring-1 ring-black/5">
+                    <img src="<?= htmlspecialchars($src) ?>" alt="<?= htmlspecialchars($leader['alt']) ?>" class="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]" loading="lazy" decoding="async">
                 </div>
-            </div>
-            <div class="md:col-span-7 lg:col-span-8">
-                <span class="inline-flex items-center gap-2 rounded-full bg-accent-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-700 sm:text-xs">
-                    <span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>
-                    Leadership
-                </span>
-                <h2 class="mt-4 text-3xl font-bold leading-tight tracking-tight text-primary-900 sm:text-4xl">From the Principal’s desk</h2>
-                <p class="mt-4 text-base leading-relaxed text-slate-700 sm:text-lg">
-                    At Kikam Technical Institute, we believe in <span class="font-semibold text-primary-900">Leadership, Integrity and Excellence</span>. Every student who walks through our gates is welcomed into a community that takes their training, character and future seriously.
-                </p>
-                <p class="mt-3 text-base leading-relaxed text-slate-600 sm:text-lg">
-                    Our staff team — teachers, instructors and support staff — work together every day to make sure our students leave Kikam with practical skills, confidence and a clear path into the world of work.
-                </p>
-                <div class="mt-6 flex flex-col gap-3 sm:flex-row">
-                    <a href="<?= APP_URL ?>?url=history" class="inline-flex items-center justify-center rounded-full bg-primary-900 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-black">
-                        Our history
-                    </a>
-                    <a href="<?= APP_URL ?>?url=contact" class="inline-flex items-center justify-center rounded-full border border-primary-900/20 bg-white px-6 py-2.5 text-sm font-semibold text-primary-900 transition hover:border-primary-900/40 hover:bg-slate-50">
-                        Contact the office
-                    </a>
+                <div class="mt-5">
+                    <h3 class="text-xl font-bold text-primary-900 sm:text-2xl"><?= htmlspecialchars($leader['name']) ?></h3>
+                    <p class="mt-1 text-xs font-semibold uppercase tracking-[0.15em] text-accent-700 sm:text-sm">
+                        <?= htmlspecialchars($leader['role']) ?>
+                    </p>
                 </div>
-            </div>
+            </article>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <a href="<?= APP_URL ?>?url=history" class="inline-flex items-center justify-center rounded-full bg-primary-900 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-black">
+                Our history
+            </a>
+            <a href="<?= APP_URL ?>?url=contact" class="inline-flex items-center justify-center rounded-full border border-primary-900/20 bg-white px-6 py-2.5 text-sm font-semibold text-primary-900 transition hover:border-primary-900/40 hover:bg-slate-50">
+                Contact the office
+            </a>
         </div>
     </div>
 </section>
