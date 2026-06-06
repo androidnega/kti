@@ -94,7 +94,7 @@ if (is_dir($memoriesDir)) {
 <?php if (!empty($alumniMemories)): ?>
 <section class="bg-white py-14 sm:py-16">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="mx-auto max-w-3xl text-center">
+        <div class="text-center">
             <span class="inline-flex items-center gap-2 rounded-full bg-accent-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-700 sm:text-xs">
                 <span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>
                 Through the years
