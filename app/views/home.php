@@ -13,6 +13,11 @@ if (empty($heroSlides)) {
             'alt_text' => 'Electrical engineering students wiring a contactor in the Kikam workshop',
             'caption' => '',
         ],
+        [
+            'image_path' => 'assets/images/hero-fashion.jpg',
+            'alt_text' => 'Fashion students drafting a pattern with rulers and measuring tape at Kikam',
+            'caption' => '',
+        ],
     ];
 }
 $slideCount = count($heroSlides);
