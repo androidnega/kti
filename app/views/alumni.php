@@ -20,7 +20,7 @@ if (is_dir($memoriesDir)) {
 <section class="relative overflow-hidden bg-primary-900 py-20 text-white sm:py-24">
     <div class="absolute inset-0 z-0 bg-black/60"></div>
     <div class="absolute inset-0 z-0 bg-cover bg-center mix-blend-overlay" style="background-image: url('<?= APP_URL ?>/assets/images/vocational.jpg');"></div>
-    <div class="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
+    <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
         <p class="mb-3 text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] text-accent-400">Old students</p>
         <h1 class="mb-4 text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-balance">Kikam alumni making us proud</h1>
         <p class="mx-auto max-w-3xl text-base sm:text-lg leading-relaxed text-primary-100">
@@ -31,7 +31,7 @@ if (is_dir($memoriesDir)) {
 
 <?php if ($count > 0): ?>
 <section class="border-b border-slate-200 bg-gray-50 py-12 sm:py-14">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <?php foreach ($alumni as $a):
                     $photo = !empty($a['photo_path']) ? rtrim(APP_URL, '/') . '/' . ltrim($a['photo_path'], '/') : '';
@@ -93,7 +93,7 @@ if (is_dir($memoriesDir)) {
 
 <?php if (!empty($alumniMemories)): ?>
 <section class="bg-white py-14 sm:py-16">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-3xl text-center">
             <span class="inline-flex items-center gap-2 rounded-full bg-accent-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-700 sm:text-xs">
                 <span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>
