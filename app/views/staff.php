@@ -82,9 +82,9 @@
 </section>
 
 <!-- Staff by Department -->
+<?php if (!empty($staffByDept)): ?>
 <section class="py-16 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <?php if (!empty($staffByDept)): ?>
             <?php foreach ($staffByDept as $department => $staffMembers): ?>
                 <div class="mb-20 last:mb-0">
                     <h2 class="text-3xl font-bold text-gray-900 mb-10 border-l-4 border-primary-600 pl-4">
@@ -117,21 +117,9 @@
                     </div>
                 </div>
             <?php endforeach; ?>
-        <?php else: ?>
-            <div class="text-center py-20">
-                <div class="bg-white rounded-2xl p-12 max-w-md mx-auto shadow-sm border border-gray-100">
-                    <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                    </div>
-                    <p class="text-xl font-bold text-gray-900">Staff info coming soon</p>
-                    <p class="text-gray-500 mt-2">We are currently updating our faculty directory.</p>
-                </div>
-            </div>
-        <?php endif; ?>
     </div>
 </section>
+<?php endif; ?>
 
 <?php
 $content = ob_get_clean();
