@@ -27,7 +27,7 @@
             </p>
         </div>
 
-        <div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10">
+        <div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-10 lg:grid-cols-3">
             <?php
             $leaders = [
                 [
@@ -41,6 +41,12 @@
                     'role' => 'Academics',
                     'image' => 'assets/images/vp-academics.jpg',
                     'alt' => 'Portrait of the Vice Principal, Academics',
+                ],
+                [
+                    'name' => 'Mr. Charles L. Saalidong',
+                    'role' => 'Vice Principal, Administration',
+                    'image' => 'assets/images/vp-administration.jpg',
+                    'alt' => 'Portrait of Mr. Charles L. Saalidong, Vice Principal, Administration',
                 ],
             ];
             foreach ($leaders as $leader):
