@@ -31,7 +31,6 @@ $slideCount = count($heroSlides);
     <div class="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-14 sm:px-6 sm:py-16 md:gap-12 md:py-20 lg:grid-cols-12 lg:gap-12 lg:px-8 lg:py-24">
         <div class="order-1 lg:col-span-5">
             <div class="relative mx-auto w-full max-w-sm sm:max-w-md lg:max-w-none">
-                <div class="absolute -inset-3 hidden rounded-3xl bg-gradient-to-br from-accent-300/40 to-primary-300/30 blur-xl lg:block" aria-hidden="true"></div>
                 <style>
                     #hero-slider .hero-slide {
                         opacity: 0;
@@ -59,7 +58,7 @@ $slideCount = count($heroSlides);
 
                 <div
                     id="hero-slider"
-                    class="relative aspect-[4/3] overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5"
+                    class="relative aspect-[4/3] overflow-hidden rounded-2xl bg-white ring-1 ring-black/5"
                     data-auto="<?= $slideCount > 1 ? '1' : '0' ?>"
                     data-interval="5500"
                     role="region"
