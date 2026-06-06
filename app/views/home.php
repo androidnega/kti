@@ -1,4 +1,15 @@
-<?php ob_start(); ?>
+<?php
+ob_start();
+$heroSlides = isset($heroSlides) && is_array($heroSlides) ? $heroSlides : [];
+if (empty($heroSlides)) {
+    $heroSlides = [[
+        'image_path' => 'assets/images/hero-workshop.png',
+        'alt_text' => 'Students learning lathe operations at Kikam Technical Institute workshop',
+        'caption' => '',
+    ]];
+}
+$slideCount = count($heroSlides);
+?>
 
 <!-- Hero Section -->
 <section class="relative overflow-hidden bg-accent-50 text-primary-900">
@@ -9,9 +20,112 @@
         <div class="order-1 lg:col-span-5">
             <div class="relative mx-auto w-full max-w-sm sm:max-w-md lg:max-w-none">
                 <div class="absolute -inset-3 hidden rounded-3xl bg-gradient-to-br from-accent-300/40 to-primary-300/30 blur-xl lg:block" aria-hidden="true"></div>
-                <div class="relative aspect-[4/3] overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5">
-                    <img src="<?= APP_URL ?>/assets/images/hero-workshop.png" alt="Students learning lathe operations at Kikam Technical Institute workshop" class="h-full w-full object-cover" loading="eager" fetchpriority="high">
+                <div
+                    id="hero-slider"
+                    class="relative aspect-[4/3] overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5"
+                    data-auto="<?= $slideCount > 1 ? '1' : '0' ?>"
+                    data-interval="5000"
+                    role="region"
+                    aria-roledescription="carousel"
+                    aria-label="Kikam Technical Institute highlights"
+                >
+                    <?php foreach ($heroSlides as $idx => $slide):
+                        $isFirst = $idx === 0;
+                        $src = !empty($slide['image_path'])
+                            ? rtrim(APP_URL, '/') . '/' . ltrim($slide['image_path'], '/')
+                            : rtrim(APP_URL, '/') . '/assets/images/hero-workshop.png';
+                        $alt = !empty($slide['alt_text']) ? $slide['alt_text'] : ($slide['caption'] ?? 'Kikam Technical Institute');
+                    ?>
+                        <figure
+                            class="hero-slide absolute inset-0 transition-opacity duration-700 ease-in-out <?= $isFirst ? 'opacity-100' : 'opacity-0 pointer-events-none' ?>"
+                            data-index="<?= (int) $idx ?>"
+                            aria-hidden="<?= $isFirst ? 'false' : 'true' ?>"
+                        >
+                            <img src="<?= htmlspecialchars($src) ?>" alt="<?= htmlspecialchars($alt) ?>" class="h-full w-full object-cover" <?= $isFirst ? 'loading="eager" fetchpriority="high"' : 'loading="lazy" decoding="async"' ?>>
+                            <?php if (!empty($slide['caption'])): ?>
+                                <figcaption class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent p-4 sm:p-5">
+                                    <span class="text-sm font-semibold text-white sm:text-base"><?= htmlspecialchars($slide['caption']) ?></span>
+                                </figcaption>
+                            <?php endif; ?>
+                        </figure>
+                    <?php endforeach; ?>
+
+                    <?php if ($slideCount > 1): ?>
+                        <div class="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5">
+                            <?php foreach ($heroSlides as $idx => $_): ?>
+                                <button
+                                    type="button"
+                                    class="hero-dot h-2 w-2 rounded-full bg-white/60 ring-1 ring-black/10 transition-all hover:bg-white <?= $idx === 0 ? 'w-6 bg-white' : '' ?>"
+                                    data-index="<?= (int) $idx ?>"
+                                    aria-label="Show slide <?= (int) $idx + 1 ?>"
+                                ></button>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
+                <?php if ($slideCount > 1): ?>
+                <script>
+                (function () {
+                    var slider = document.getElementById('hero-slider');
+                    if (!slider) return;
+                    var slides = Array.prototype.slice.call(slider.querySelectorAll('.hero-slide'));
+                    var dots = Array.prototype.slice.call(slider.querySelectorAll('.hero-dot'));
+                    if (slides.length < 2) return;
+                    var current = 0;
+                    var interval = parseInt(slider.getAttribute('data-interval'), 10) || 5000;
+                    var auto = slider.getAttribute('data-auto') === '1';
+                    var timer = null;
+                    var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+                    function show(next) {
+                        next = ((next % slides.length) + slides.length) % slides.length;
+                        if (next === current) return;
+                        slides[current].classList.remove('opacity-100');
+                        slides[current].classList.add('opacity-0', 'pointer-events-none');
+                        slides[current].setAttribute('aria-hidden', 'true');
+                        slides[next].classList.remove('opacity-0', 'pointer-events-none');
+                        slides[next].classList.add('opacity-100');
+                        slides[next].setAttribute('aria-hidden', 'false');
+                        if (dots.length) {
+                            dots[current].classList.remove('w-6', 'bg-white');
+                            dots[current].classList.add('bg-white/60');
+                            dots[next].classList.add('w-6', 'bg-white');
+                            dots[next].classList.remove('bg-white/60');
+                        }
+                        current = next;
+                    }
+
+                    function tick() { show(current + 1); }
+
+                    function start() {
+                        if (!auto || prefersReducedMotion) return;
+                        stop();
+                        timer = setInterval(tick, interval);
+                    }
+                    function stop() {
+                        if (timer) { clearInterval(timer); timer = null; }
+                    }
+
+                    dots.forEach(function (dot) {
+                        dot.addEventListener('click', function () {
+                            var i = parseInt(dot.getAttribute('data-index'), 10) || 0;
+                            show(i);
+                            start();
+                        });
+                    });
+
+                    slider.addEventListener('mouseenter', stop);
+                    slider.addEventListener('mouseleave', start);
+                    slider.addEventListener('focusin', stop);
+                    slider.addEventListener('focusout', start);
+                    document.addEventListener('visibilitychange', function () {
+                        if (document.hidden) stop(); else start();
+                    });
+
+                    start();
+                })();
+                </script>
+                <?php endif; ?>
             </div>
         </div>
 

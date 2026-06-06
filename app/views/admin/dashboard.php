@@ -22,6 +22,10 @@
             <i class="fa-regular fa-calendar text-xs text-slate-500"></i>
             New event
         </a>
+        <a href="<?= ADMIN_URL ?>?action=hero_slides" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:border-slate-400 hover:bg-slate-50">
+            <i class="fa-regular fa-images text-xs text-slate-500"></i>
+            Hero slides
+        </a>
     </div>
 </div>
 

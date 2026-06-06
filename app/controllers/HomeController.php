@@ -5,6 +5,7 @@ require_once APP_PATH . '/models/Program.php';
 require_once APP_PATH . '/models/Staff.php';
 require_once APP_PATH . '/models/Alumni.php';
 require_once APP_PATH . '/models/EventItem.php';
+require_once APP_PATH . '/models/HeroSlide.php';
 require_once APP_PATH . '/helpers/YoutubeFeed.php';
 
 class HomeController extends BaseController {
@@ -13,6 +14,7 @@ class HomeController extends BaseController {
     private $staffModel;
     private $alumniModel;
     private $eventModel;
+    private $heroModel;
 
     public function __construct() {
         $this->pageModel = new Page();
@@ -20,6 +22,7 @@ class HomeController extends BaseController {
         $this->staffModel = new Staff();
         $this->alumniModel = new Alumni();
         $this->eventModel = new EventItem();
+        $this->heroModel = new HeroSlide();
     }
 
     public function index() {
@@ -28,8 +31,10 @@ class HomeController extends BaseController {
             $this->programModel->enrichProgramCover($p);
         }
         unset($p);
+        $heroSlides = $this->heroModel->publicList();
         $this->view('home', [
             'programs' => array_slice($programs, 0, 3),
+            'heroSlides' => $heroSlides,
         ]);
     }
 

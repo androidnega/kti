@@ -112,6 +112,23 @@ switch ($action) {
         $controller->alumniDelete($id);
         break;
 
+    // Hero slides
+    case 'hero_slides':
+        $controller->heroSlides();
+        break;
+    case 'hero_slide_upload':
+        $controller->heroSlideUpload();
+        break;
+    case 'hero_slide_update':
+        $controller->heroSlideUpdate();
+        break;
+    case 'hero_slide_reorder':
+        $controller->heroSlideReorder();
+        break;
+    case 'hero_slide_delete':
+        $controller->heroSlideDelete($id);
+        break;
+
     // Events
     case 'events':
         $controller->events();

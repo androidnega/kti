@@ -139,6 +139,22 @@ class Database {
         $this->connection->exec(
             'CREATE INDEX IF NOT EXISTS idx_events_published ON events(is_published)'
         );
+
+        $this->connection->exec(
+            'CREATE TABLE IF NOT EXISTS hero_slides (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                image_path TEXT NOT NULL,
+                caption TEXT,
+                alt_text TEXT,
+                sort_order INTEGER NOT NULL DEFAULT 0,
+                is_active INTEGER NOT NULL DEFAULT 1,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )'
+        );
+        $this->connection->exec(
+            'CREATE INDEX IF NOT EXISTS idx_hero_slides_sort ON hero_slides(sort_order, id)'
+        );
     }
 
     public function query($sql, $params = []) {

@@ -93,6 +93,7 @@
                     echo '<span>' . htmlspecialchars($label) . '</span></a>';
                 };
                 $nav(ADMIN_URL . '?action=dashboard', 'Dashboard', '<i class="fa-solid fa-chart-line text-sm"></i>', $a === 'dashboard');
+                $nav(ADMIN_URL . '?action=hero_slides', 'Hero Slides', '<i class="fa-regular fa-images text-sm"></i>', in_array($a, ['hero_slides', 'hero_slide_upload', 'hero_slide_update', 'hero_slide_reorder', 'hero_slide_delete'], true));
                 $nav(ADMIN_URL . '?action=pages', 'Pages', '<i class="fa-regular fa-file-lines text-sm"></i>', in_array($a, ['pages', 'page_create', 'page_edit'], true));
                 $nav(ADMIN_URL . '?action=staff', 'Staff', '<i class="fa-solid fa-users text-sm"></i>', in_array($a, ['staff', 'staff_create', 'staff_edit'], true));
                 $nav(ADMIN_URL . '?action=programs', 'Departments', '<i class="fa-solid fa-graduation-cap text-sm"></i>', in_array($a, ['programs', 'program_create', 'program_edit', 'program_media_upload', 'program_cover_upload', 'program_video_upload', 'program_video_url_save', 'program_media_reorder', 'program_media_delete', 'program_media_set_cover', 'program_media_caption_save'], true));

@@ -83,6 +83,19 @@ CREATE TABLE IF NOT EXISTS alumni (
 );
 CREATE INDEX IF NOT EXISTS idx_alumni_sort ON alumni(sort_order, id);
 
+-- Hero slides on the public homepage
+CREATE TABLE IF NOT EXISTS hero_slides (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    image_path TEXT NOT NULL,
+    caption TEXT,
+    alt_text TEXT,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    is_active INTEGER NOT NULL DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_hero_slides_sort ON hero_slides(sort_order, id);
+
 -- Events
 CREATE TABLE IF NOT EXISTS events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

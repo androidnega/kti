@@ -6,6 +6,7 @@ require_once APP_PATH . '/models/Program.php';
 require_once APP_PATH . '/models/ProgramMedia.php';
 require_once APP_PATH . '/models/Alumni.php';
 require_once APP_PATH . '/models/EventItem.php';
+require_once APP_PATH . '/models/HeroSlide.php';
 require_once APP_PATH . '/helpers/ImageProcessor.php';
 require_once APP_PATH . '/helpers/ContentSanitizer.php';
 
@@ -16,6 +17,7 @@ class AdminController extends BaseController {
     private $programMediaModel;
     private $alumniModel;
     private $eventModel;
+    private $heroModel;
 
     public function __construct() {
         $this->pageModel = new Page();
@@ -24,6 +26,7 @@ class AdminController extends BaseController {
         $this->programMediaModel = new ProgramMedia();
         $this->alumniModel = new Alumni();
         $this->eventModel = new EventItem();
+        $this->heroModel = new HeroSlide();
     }
 
     public function dashboard() {
@@ -437,6 +440,106 @@ class AdminController extends BaseController {
             'updated_at' => gmdate('Y-m-d H:i:s'),
         ]);
         $this->redirect(ADMIN_URL . '?action=program_edit&id=' . $programId);
+    }
+
+    // ===== Hero slides =====
+
+    public function heroSlides() {
+        $slides = $this->heroModel->allOrdered();
+        $this->view('admin/hero/index', ['slides' => $slides]);
+    }
+
+    /**
+     * Multipart upload endpoint. Accepts one image per request via field `file`
+     * (used by the drag-and-drop uploader on the index page). Returns JSON.
+     */
+    public function heroSlideUpload() {
+        if (empty($_FILES['file']) || !is_uploaded_file($_FILES['file']['tmp_name'])) {
+            $this->json(['ok' => false, 'error' => 'No file uploaded'], 400);
+        }
+        $tmp = $_FILES['file']['tmp_name'];
+        if (@getimagesize($tmp) === false) {
+            $this->json(['ok' => false, 'error' => 'Not a valid image'], 400);
+        }
+        if (!is_dir(HERO_UPLOAD_PATH)) {
+            @mkdir(HERO_UPLOAD_PATH, 0755, true);
+        }
+        $basename = 'hero_' . bin2hex(random_bytes(6)) . '.jpg';
+        $absDest = rtrim(HERO_UPLOAD_PATH, '/') . '/' . $basename;
+        if (!ImageProcessor::toJpegMaxBytes($tmp, $absDest)) {
+            $this->json(['ok' => false, 'error' => 'Could not process image'], 500);
+        }
+        $webPath = 'uploads/hero/' . $basename;
+        $sort = $this->heroModel->nextSortOrder();
+        $id = (int) $this->heroModel->create([
+            'image_path' => $webPath,
+            'caption' => '',
+            'alt_text' => '',
+            'sort_order' => $sort,
+            'is_active' => 1,
+            'created_at' => gmdate('Y-m-d H:i:s'),
+            'updated_at' => gmdate('Y-m-d H:i:s'),
+        ]);
+        $this->json([
+            'ok' => true,
+            'id' => $id,
+            'image_path' => $webPath,
+            'url' => rtrim(APP_URL, '/') . '/' . $webPath,
+            'sort_order' => $sort,
+        ]);
+    }
+
+    public function heroSlideUpdate() {
+        $id = (int) ($_POST['id'] ?? 0);
+        if ($id < 1) {
+            $this->json(['ok' => false, 'error' => 'Invalid id'], 400);
+        }
+        $row = $this->heroModel->find($id);
+        if (!$row) {
+            $this->json(['ok' => false, 'error' => 'Not found'], 404);
+        }
+        $data = ['updated_at' => gmdate('Y-m-d H:i:s')];
+        if (array_key_exists('caption', $_POST)) {
+            $data['caption'] = htmlspecialchars(trim((string) $_POST['caption']), ENT_QUOTES, 'UTF-8');
+        }
+        if (array_key_exists('alt_text', $_POST)) {
+            $data['alt_text'] = htmlspecialchars(trim((string) $_POST['alt_text']), ENT_QUOTES, 'UTF-8');
+        }
+        if (array_key_exists('is_active', $_POST)) {
+            $data['is_active'] = empty($_POST['is_active']) ? 0 : 1;
+        }
+        $this->heroModel->update($id, $data);
+        $this->json(['ok' => true]);
+    }
+
+    public function heroSlideReorder() {
+        $raw = file_get_contents('php://input');
+        $body = json_decode($raw, true);
+        if (!is_array($body) || !isset($body['ids']) || !is_array($body['ids'])) {
+            $this->json(['ok' => false, 'error' => 'Expected JSON {ids:[]}'], 400);
+        }
+        $ids = array_values(array_filter(array_map('intval', $body['ids']), function ($i) {
+            return $i > 0;
+        }));
+        $this->heroModel->updateOrder($ids);
+        $this->json(['ok' => true]);
+    }
+
+    public function heroSlideDelete($id) {
+        $id = (int) $id;
+        if ($id < 1) {
+            $this->redirect(ADMIN_URL . '?action=hero_slides');
+            return;
+        }
+        $row = $this->heroModel->find($id);
+        if ($row && !empty($row['image_path'])) {
+            $abs = PUBLIC_PATH . '/' . ltrim($row['image_path'], '/');
+            if (is_file($abs)) {
+                @unlink($abs);
+            }
+        }
+        $this->heroModel->delete($id);
+        $this->redirect(ADMIN_URL . '?action=hero_slides');
     }
 
     // ===== Alumni / Old Students =====
