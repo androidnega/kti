@@ -35,26 +35,30 @@
                     'role' => 'Principal',
                     'image' => 'assets/images/principal.jpg',
                     'alt' => 'Portrait of Mr. Emmanuel A. Anomah, Principal',
+                    'focus' => '50% 50%',
                 ],
                 [
                     'name' => 'Vice Principal, Academics',
                     'role' => 'Academics',
                     'image' => 'assets/images/vp-academics.jpg',
                     'alt' => 'Portrait of the Vice Principal, Academics',
+                    'focus' => '50% 22%',
                 ],
                 [
                     'name' => 'Mr. Charles L. Saalidong',
                     'role' => 'Vice Principal, Administration',
                     'image' => 'assets/images/vp-administration.jpg',
                     'alt' => 'Portrait of Mr. Charles L. Saalidong, Vice Principal, Administration',
+                    'focus' => '50% 25%',
                 ],
             ];
             foreach ($leaders as $leader):
                 $src = rtrim(APP_URL, '/') . '/' . ltrim($leader['image'], '/');
+                $focus = $leader['focus'] ?? '50% 50%';
             ?>
             <article class="group mx-auto w-full max-w-[14rem] text-center sm:max-w-[16rem]">
                 <div class="relative aspect-[3/4] overflow-hidden rounded-xl bg-slate-100 shadow-md ring-1 ring-black/5">
-                    <img src="<?= htmlspecialchars($src) ?>" alt="<?= htmlspecialchars($leader['alt']) ?>" class="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]" loading="lazy" decoding="async">
+                    <img src="<?= htmlspecialchars($src) ?>" alt="<?= htmlspecialchars($leader['alt']) ?>" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]" style="object-position: <?= htmlspecialchars($focus) ?>;" loading="lazy" decoding="async">
                 </div>
                 <div class="mt-4">
                     <h3 class="text-base font-bold text-primary-900 sm:text-lg"><?= htmlspecialchars($leader['name']) ?></h3>
