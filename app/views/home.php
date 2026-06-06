@@ -1,91 +1,35 @@
 <?php ob_start(); ?>
 
 <!-- Hero Section -->
-<section class="hero relative py-20 sm:py-24 md:py-32 bg-cover bg-center" style="background-image: url('<?= APP_URL ?>/assets/images/droneshotcampus.jpg');">
-    <div class="absolute inset-0 bg-gradient-to-br from-primary-900/95 via-primary-900/85 to-primary-900/80"></div>
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-        <h1 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-3 sm:mb-4 leading-tight tracking-tight text-balance" style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
-            <span class="text-white">Welcome to Kikam Technical Institute</span>
+<section class="relative isolate overflow-hidden bg-primary-900 text-white">
+    <div class="absolute inset-0 -z-10">
+        <img src="<?= APP_URL ?>/assets/images/droneshotcampus.jpg" alt="" class="h-full w-full object-cover opacity-40" loading="eager" fetchpriority="high">
+        <div class="absolute inset-0 bg-gradient-to-b from-primary-900/70 via-primary-900/85 to-primary-900"></div>
+    </div>
+
+    <div class="mx-auto flex max-w-5xl flex-col items-center px-4 py-24 text-center sm:px-6 sm:py-28 md:py-32 lg:py-36">
+        <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-300 backdrop-blur sm:text-xs">
+            <span class="h-1.5 w-1.5 rounded-full bg-accent-400"></span>
+            Established 1963
+        </span>
+
+        <h1 class="mt-6 max-w-4xl text-balance text-3xl font-bold leading-[1.1] tracking-tight sm:text-5xl md:text-6xl">
+            Kikam Technical Institute
         </h1>
-        <p class="font-sans text-xl sm:text-2xl md:text-3xl font-semibold text-accent-400 mb-8 sm:mb-10 text-balance">
-            <span class="text-white">We are</span>
-            <span class="ml-3 border-r-2 border-accent-400 pr-1 min-w-[7ch]" id="typewriter-dynamic"></span>
+
+        <p class="mt-5 max-w-2xl text-balance text-base leading-relaxed text-primary-100 sm:text-lg md:text-xl">
+            Hands-on technical and vocational training in the Western Region of Ghana — preparing students with the skills industry actually needs.
         </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="<?= APP_URL ?>?url=programs" class="btn bg-primary-900 hover:bg-black text-white px-8 py-3 rounded-md text-lg transition-colors border-2 border-primary-900">
-                Explore Programs
+
+        <div class="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:gap-4">
+            <a href="<?= APP_URL ?>?url=departments" class="inline-flex items-center justify-center rounded-full bg-accent-400 px-7 py-3 text-base font-semibold text-primary-900 shadow-sm transition hover:bg-accent-300 focus:outline-none focus:ring-2 focus:ring-accent-300 focus:ring-offset-2 focus:ring-offset-primary-900">
+                Explore departments
+                <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </a>
-            <a href="<?= APP_URL ?>?url=contact" class="btn bg-white hover:bg-gray-100 text-primary-900 px-8 py-3 rounded-md text-lg transition-colors border-2 border-white">
-                Contact Us
+            <a href="<?= APP_URL ?>?url=contact" class="inline-flex items-center justify-center rounded-full border border-white/25 px-7 py-3 text-base font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-primary-900">
+                Contact us
             </a>
         </div>
-        <script>
-            (function () {
-                const phrases = [
-                    'Supreme Kimtech',
-                    'TVET Excellence',
-                    'Skills for Life',
-                    'Career Ready'
-                ];
-
-                const el = document.getElementById('typewriter-dynamic');
-                if (!el) return;
-
-                let phraseIndex = 0;
-                let charIndex = 0;
-                let deleting = false;
-
-                function randomDelay(base, variance) {
-                    return base + Math.floor(Math.random() * variance);
-                }
-
-                function nextPhrase() {
-                    phraseIndex = (phraseIndex + 1) % phrases.length;
-                }
-
-                function tick() {
-                    const current = phrases[phraseIndex];
-
-                    // Randomly choose a typing style each full cycle
-                    const style = phraseIndex % 3; // 0: normal, 1: fast, 2: slower
-
-                    const typingBase = style === 0 ? 90 : style === 1 ? 55 : 120;
-                    const typingVar = style === 0 ? 60 : style === 1 ? 30 : 40;
-                    const deletingBase = style === 0 ? 60 : style === 1 ? 45 : 80;
-                    const deletingVar = style === 0 ? 40 : style === 1 ? 25 : 35;
-
-                    if (!deleting) {
-                        charIndex++;
-                        el.textContent = current.slice(0, charIndex);
-
-                        if (charIndex === current.length) {
-                            // Hold full text briefly, then maybe do a quick blink before deleting
-                            const holdTime = style === 1 ? 800 : 1200;
-                            setTimeout(() => {
-                                deleting = true;
-                                tick();
-                            }, holdTime);
-                            return;
-                        }
-                    } else {
-                        charIndex--;
-                        el.textContent = current.slice(0, charIndex);
-
-                        if (charIndex === 0) {
-                            deleting = false;
-                            nextPhrase();
-                        }
-                    }
-
-                    const base = deleting ? deletingBase : typingBase;
-                    const variance = deleting ? deletingVar : typingVar;
-                    setTimeout(tick, randomDelay(base, variance));
-                }
-
-                // Start with a small delay so page loads cleanly
-                setTimeout(tick, 600);
-            })();
-        </script>
     </div>
 </section>
 
