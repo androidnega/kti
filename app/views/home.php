@@ -221,9 +221,10 @@ $slideCount = count($heroSlides);
                     aria-label="Play video about Kikam Technical Institute"
                 >
                     <img
-                        src="https://i.ytimg.com/vi/_fgBVzVGSFU/hqdefault.jpg"
-                        alt=""
+                        src="<?= APP_URL ?>/assets/images/principal.jpg"
+                        alt="Mr. Emmanuel A. Anomah, Principal of Kikam Technical Institute"
                         class="absolute inset-0 h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-90"
+                        style="object-position: 50% 30%;"
                         loading="lazy"
                         decoding="async"
                     >
@@ -269,18 +270,6 @@ $slideCount = count($heroSlides);
                             load(true);
                         }
                     });
-
-                    if ('IntersectionObserver' in window) {
-                        var io = new IntersectionObserver(function (entries) {
-                            entries.forEach(function (entry) {
-                                if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-                                    load(true);
-                                    io.disconnect();
-                                }
-                            });
-                        }, { threshold: [0.5] });
-                        io.observe(wrap);
-                    }
                 })();
                 </script>
             </div>
