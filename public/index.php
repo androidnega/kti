@@ -28,6 +28,13 @@ if (empty($url) || $url === 'home') {
     $controller->videos();
 } elseif ($url === 'contact') {
     $controller->contact();
+} elseif ($url === 'alumni' || $url === 'old-students' || $url === 'oldstudents') {
+    $controller->alumni();
+} elseif ($url === 'events') {
+    $controller->events();
+} elseif (strpos($url, 'event/') === 0) {
+    $slug = substr($url, strlen('event/'));
+    $controller->eventDetail($slug);
 } else {
     $controller->page($url);
 }

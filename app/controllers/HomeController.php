@@ -3,17 +3,23 @@
 require_once APP_PATH . '/models/Page.php';
 require_once APP_PATH . '/models/Program.php';
 require_once APP_PATH . '/models/Staff.php';
+require_once APP_PATH . '/models/Alumni.php';
+require_once APP_PATH . '/models/EventItem.php';
 require_once APP_PATH . '/helpers/YoutubeFeed.php';
 
 class HomeController extends BaseController {
     private $pageModel;
     private $programModel;
     private $staffModel;
+    private $alumniModel;
+    private $eventModel;
 
     public function __construct() {
         $this->pageModel = new Page();
         $this->programModel = new Program();
         $this->staffModel = new Staff();
+        $this->alumniModel = new Alumni();
+        $this->eventModel = new EventItem();
     }
 
     public function index() {
@@ -111,6 +117,33 @@ class HomeController extends BaseController {
 
     public function contact() {
         $this->view('contact');
+    }
+
+    public function alumni() {
+        $alumni = $this->alumniModel->publicList();
+        $this->view('alumni', [
+            'alumni' => $alumni,
+        ]);
+    }
+
+    public function events() {
+        $events = $this->eventModel->publicList();
+        $this->view('events', [
+            'events' => $events,
+        ]);
+    }
+
+    public function eventDetail($slug) {
+        $slug = trim((string) $slug);
+        $event = $this->eventModel->findBySlug($slug);
+        if (!$event || (int) ($event['is_published'] ?? 0) !== 1) {
+            http_response_code(404);
+            echo '<h1>Event not found</h1><p><a href="' . htmlspecialchars(APP_URL) . '?url=events">Back to events</a></p>';
+            return;
+        }
+        $this->view('event_detail', [
+            'event' => $event,
+        ]);
     }
 
     public function page($slug) {

@@ -65,6 +65,43 @@ CREATE TABLE IF NOT EXISTS program_media (
 );
 CREATE INDEX IF NOT EXISTS idx_program_media_program ON program_media(program_id);
 
+-- Alumni / Old Students profiles
+CREATE TABLE IF NOT EXISTS alumni (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    program TEXT,
+    graduation_year TEXT,
+    current_role TEXT,
+    location TEXT,
+    quote TEXT,
+    bio TEXT,
+    photo_path TEXT,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    is_featured INTEGER NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_alumni_sort ON alumni(sort_order, id);
+
+-- Events
+CREATE TABLE IF NOT EXISTS events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    slug TEXT UNIQUE,
+    summary TEXT,
+    content TEXT,
+    event_date DATETIME,
+    end_date DATETIME,
+    location TEXT,
+    cover_image TEXT,
+    is_published INTEGER NOT NULL DEFAULT 1,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_events_date ON events(event_date);
+CREATE INDEX IF NOT EXISTS idx_events_published ON events(is_published);
+
 -- Insert initial admin user (credentials should be changed in production)
 INSERT INTO users (name, email, password_hash, role) 
 VALUES ('admin', 'admin', '$2y$12$Ep4jHbD8Ju7loJj1QeiK9.gYzYS.nNwuNuTDJW0PE3BIK8jQfzbJq', 'admin');

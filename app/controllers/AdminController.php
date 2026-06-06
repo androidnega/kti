@@ -4,6 +4,8 @@ require_once APP_PATH . '/models/Page.php';
 require_once APP_PATH . '/models/Staff.php';
 require_once APP_PATH . '/models/Program.php';
 require_once APP_PATH . '/models/ProgramMedia.php';
+require_once APP_PATH . '/models/Alumni.php';
+require_once APP_PATH . '/models/EventItem.php';
 require_once APP_PATH . '/helpers/ImageProcessor.php';
 require_once APP_PATH . '/helpers/ContentSanitizer.php';
 
@@ -12,12 +14,16 @@ class AdminController extends BaseController {
     private $staffModel;
     private $programModel;
     private $programMediaModel;
+    private $alumniModel;
+    private $eventModel;
 
     public function __construct() {
         $this->pageModel = new Page();
         $this->staffModel = new Staff();
         $this->programModel = new Program();
         $this->programMediaModel = new ProgramMedia();
+        $this->alumniModel = new Alumni();
+        $this->eventModel = new EventItem();
     }
 
     public function dashboard() {
@@ -25,6 +31,8 @@ class AdminController extends BaseController {
             'pages' => count($this->pageModel->all()),
             'staff' => count($this->staffModel->all()),
             'programs' => count($this->programModel->all()),
+            'alumni' => count($this->alumniModel->all()),
+            'events' => count($this->eventModel->all()),
         ];
         $this->view('admin/dashboard', ['stats' => $stats]);
     }
@@ -429,6 +437,225 @@ class AdminController extends BaseController {
             'updated_at' => gmdate('Y-m-d H:i:s'),
         ]);
         $this->redirect(ADMIN_URL . '?action=program_edit&id=' . $programId);
+    }
+
+    // ===== Alumni / Old Students =====
+
+    public function alumni() {
+        $rows = $this->alumniModel->allOrdered();
+        $this->view('admin/alumni/index', ['alumni' => $rows]);
+    }
+
+    public function alumniForm($id = null) {
+        $member = $id ? $this->alumniModel->find($id) : null;
+        $this->view('admin/alumni/form', ['member' => $member]);
+    }
+
+    public function alumniSave() {
+        $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+        $name = trim((string) ($_POST['name'] ?? ''));
+        if ($name === '') {
+            $this->redirect(ADMIN_URL . '?action=alumni');
+            return;
+        }
+
+        $now = gmdate('Y-m-d H:i:s');
+        $data = [
+            'name' => $this->sanitize($name),
+            'program' => $this->sanitize($_POST['program'] ?? ''),
+            'graduation_year' => $this->sanitize($_POST['graduation_year'] ?? ''),
+            'current_role' => $this->sanitize($_POST['current_role'] ?? ''),
+            'location' => $this->sanitize($_POST['location'] ?? ''),
+            'quote' => $this->sanitize($_POST['quote'] ?? ''),
+            'bio' => htmlspecialchars(trim((string) ($_POST['bio'] ?? '')), ENT_QUOTES, 'UTF-8'),
+            'sort_order' => (int) ($_POST['sort_order'] ?? 0),
+            'is_featured' => empty($_POST['is_featured']) ? 0 : 1,
+            'updated_at' => $now,
+        ];
+
+        $photoPath = $this->handleAlumniPhotoUpload();
+        if ($photoPath !== null) {
+            $data['photo_path'] = $photoPath;
+        }
+
+        if ($id > 0) {
+            $existing = $this->alumniModel->find($id);
+            if ($existing && $photoPath === null && empty($_POST['_keep_photo'])) {
+                // No new upload, keep existing path silently
+            }
+            $this->alumniModel->update($id, $data);
+        } else {
+            $data['created_at'] = $now;
+            $id = (int) $this->alumniModel->create($data);
+        }
+
+        $this->redirect(ADMIN_URL . '?action=alumni_edit&id=' . max(1, $id));
+    }
+
+    public function alumniDelete($id) {
+        $id = (int) $id;
+        if ($id < 1) {
+            $this->redirect(ADMIN_URL . '?action=alumni');
+            return;
+        }
+        $row = $this->alumniModel->find($id);
+        if ($row && !empty($row['photo_path'])) {
+            $abs = PUBLIC_PATH . '/' . ltrim($row['photo_path'], '/');
+            if (is_file($abs)) {
+                @unlink($abs);
+            }
+        }
+        $this->alumniModel->delete($id);
+        $this->redirect(ADMIN_URL . '?action=alumni');
+    }
+
+    /**
+     * Read the uploaded `photo` from the alumni form, write a normalized JPEG
+     * into ALUMNI_UPLOAD_PATH, and return the web-relative path (or null when
+     * no usable file was sent).
+     */
+    private function handleAlumniPhotoUpload() {
+        if (empty($_FILES['photo']) || !is_array($_FILES['photo'])) {
+            return null;
+        }
+        if (($_FILES['photo']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+            return null;
+        }
+        if (!is_uploaded_file($_FILES['photo']['tmp_name'])) {
+            return null;
+        }
+        $tmp = $_FILES['photo']['tmp_name'];
+        if (@getimagesize($tmp) === false) {
+            return null;
+        }
+        if (!is_dir(ALUMNI_UPLOAD_PATH)) {
+            @mkdir(ALUMNI_UPLOAD_PATH, 0755, true);
+        }
+        $basename = 'a_' . bin2hex(random_bytes(6)) . '.jpg';
+        $absDest = rtrim(ALUMNI_UPLOAD_PATH, '/') . '/' . $basename;
+        if (!ImageProcessor::toJpegMaxBytes($tmp, $absDest)) {
+            return null;
+        }
+        return 'uploads/alumni/' . $basename;
+    }
+
+    // ===== Events =====
+
+    public function events() {
+        $rows = $this->eventModel->adminList();
+        $this->view('admin/events/index', ['events' => $rows]);
+    }
+
+    public function eventForm($id = null) {
+        $event = $id ? $this->eventModel->find($id) : null;
+        $this->view('admin/events/form', ['event' => $event]);
+    }
+
+    public function eventSave() {
+        $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+        $title = trim((string) ($_POST['title'] ?? ''));
+        if ($title === '') {
+            $this->redirect(ADMIN_URL . '?action=events');
+            return;
+        }
+
+        $slugInput = trim((string) ($_POST['slug'] ?? ''));
+        $baseSlug = $slugInput !== '' ? EventItem::slugify($slugInput) : EventItem::slugify($title);
+        $slug = $this->uniqueEventSlug($baseSlug, $id > 0 ? $id : null);
+
+        $contentRaw = trim(ContentSanitizer::stripDataImageUris((string) ($_POST['content'] ?? '')));
+        $contentSafe = ContentSanitizer::sanitizeProgramDetailHtml($contentRaw);
+
+        $eventDate = trim((string) ($_POST['event_date'] ?? ''));
+        $endDate = trim((string) ($_POST['end_date'] ?? ''));
+        $eventDateNorm = $eventDate !== '' ? str_replace('T', ' ', $eventDate) : null;
+        $endDateNorm = $endDate !== '' ? str_replace('T', ' ', $endDate) : null;
+
+        $now = gmdate('Y-m-d H:i:s');
+        $data = [
+            'title' => $this->sanitize($title),
+            'slug' => $slug,
+            'summary' => $this->sanitize($_POST['summary'] ?? ''),
+            'content' => $contentSafe,
+            'event_date' => $eventDateNorm,
+            'end_date' => $endDateNorm,
+            'location' => $this->sanitize($_POST['location'] ?? ''),
+            'is_published' => empty($_POST['is_published']) ? 0 : 1,
+            'sort_order' => (int) ($_POST['sort_order'] ?? 0),
+            'updated_at' => $now,
+        ];
+
+        $coverPath = $this->handleEventCoverUpload();
+        if ($coverPath !== null) {
+            $data['cover_image'] = $coverPath;
+        }
+
+        if ($id > 0) {
+            $this->eventModel->update($id, $data);
+        } else {
+            $data['created_at'] = $now;
+            $id = (int) $this->eventModel->create($data);
+        }
+
+        $this->redirect(ADMIN_URL . '?action=event_edit&id=' . max(1, $id));
+    }
+
+    public function eventDelete($id) {
+        $id = (int) $id;
+        if ($id < 1) {
+            $this->redirect(ADMIN_URL . '?action=events');
+            return;
+        }
+        $row = $this->eventModel->find($id);
+        if ($row && !empty($row['cover_image'])) {
+            $abs = PUBLIC_PATH . '/' . ltrim($row['cover_image'], '/');
+            if (is_file($abs)) {
+                @unlink($abs);
+            }
+        }
+        $this->eventModel->delete($id);
+        $this->redirect(ADMIN_URL . '?action=events');
+    }
+
+    private function handleEventCoverUpload() {
+        if (empty($_FILES['cover']) || !is_array($_FILES['cover'])) {
+            return null;
+        }
+        if (($_FILES['cover']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+            return null;
+        }
+        if (!is_uploaded_file($_FILES['cover']['tmp_name'])) {
+            return null;
+        }
+        $tmp = $_FILES['cover']['tmp_name'];
+        if (@getimagesize($tmp) === false) {
+            return null;
+        }
+        if (!is_dir(EVENT_UPLOAD_PATH)) {
+            @mkdir(EVENT_UPLOAD_PATH, 0755, true);
+        }
+        $basename = 'e_' . bin2hex(random_bytes(6)) . '.jpg';
+        $absDest = rtrim(EVENT_UPLOAD_PATH, '/') . '/' . $basename;
+        if (!ImageProcessor::toJpegMaxBytes($tmp, $absDest)) {
+            return null;
+        }
+        return 'uploads/events/' . $basename;
+    }
+
+    private function uniqueEventSlug($base, $excludeId = null) {
+        $slug = $base;
+        $n = 2;
+        $db = Database::getInstance();
+        while (true) {
+            $row = $db->fetchOne('SELECT id FROM events WHERE slug = ?', [$slug]);
+            if (!$row) {
+                return $slug;
+            }
+            if ($excludeId !== null && (int) $row['id'] === (int) $excludeId) {
+                return $slug;
+            }
+            $slug = $base . '-' . $n++;
+        }
     }
 
     /**

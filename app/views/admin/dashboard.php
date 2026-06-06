@@ -14,10 +14,18 @@
             <i class="fa-solid fa-user-plus text-xs text-slate-500"></i>
             Add staff
         </a>
+        <a href="<?= ADMIN_URL ?>?action=alumni_create" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:border-slate-400 hover:bg-slate-50">
+            <i class="fa-solid fa-user-group text-xs text-slate-500"></i>
+            Add alumnus
+        </a>
+        <a href="<?= ADMIN_URL ?>?action=event_create" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 hover:border-slate-400 hover:bg-slate-50">
+            <i class="fa-regular fa-calendar text-xs text-slate-500"></i>
+            New event
+        </a>
     </div>
 </div>
 
-<div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+<div class="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
     <div class="rounded-xl border border-slate-200 bg-white px-5 py-4">
         <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Pages</p>
         <p class="mt-2 text-3xl font-semibold tabular-nums text-slate-900"><?= (int) $stats['pages'] ?></p>
@@ -27,8 +35,16 @@
         <p class="mt-2 text-3xl font-semibold tabular-nums text-slate-900"><?= (int) $stats['staff'] ?></p>
     </div>
     <div class="rounded-xl border border-slate-200 bg-white px-5 py-4">
-        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Programs</p>
+        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Departments</p>
         <p class="mt-2 text-3xl font-semibold tabular-nums text-slate-900"><?= (int) $stats['programs'] ?></p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white px-5 py-4">
+        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Old Students</p>
+        <p class="mt-2 text-3xl font-semibold tabular-nums text-slate-900"><?= (int) ($stats['alumni'] ?? 0) ?></p>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white px-5 py-4">
+        <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Events</p>
+        <p class="mt-2 text-3xl font-semibold tabular-nums text-slate-900"><?= (int) ($stats['events'] ?? 0) ?></p>
     </div>
 </div>
 

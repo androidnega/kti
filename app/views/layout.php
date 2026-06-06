@@ -111,6 +111,9 @@
     <?php
     $navUrl = strtolower(rtrim((string) ($_GET['url'] ?? ''), '/'));
     $programsNavActive = ($navUrl === 'programs' || $navUrl === 'departments' || strpos($navUrl, 'program/') === 0);
+    $alumniNavActive = in_array($navUrl, ['alumni', 'old-students', 'oldstudents'], true);
+    $eventsNavActive = ($navUrl === 'events' || strpos($navUrl, 'event/') === 0);
+    $communityNavActive = ($alumniNavActive || $eventsNavActive);
     ?>
     <!-- Navigation -->
     <nav class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
@@ -128,10 +131,20 @@
                 </div>
 
                 <!-- Desktop nav -->
-                <div class="hidden md:flex items-center space-x-8">
+                <div class="hidden md:flex items-center space-x-6 lg:space-x-8">
                     <a href="<?= APP_URL ?>" class="nav-link <?= empty($_GET['url']) || $_GET['url'] === 'home' ? 'nav-link-active' : '' ?>">Home</a>
                     <a href="<?= APP_URL ?>?url=history" class="nav-link <?= ($_GET['url'] ?? '') === 'history' ? 'nav-link-active' : '' ?>">History</a>
-                    <a href="<?= APP_URL ?>?url=programs" class="nav-link <?= $programsNavActive ? 'nav-link-active' : '' ?>">Programs</a>
+                    <a href="<?= APP_URL ?>?url=departments" class="nav-link <?= $programsNavActive ? 'nav-link-active' : '' ?>">Departments</a>
+                    <div class="relative" data-nav-dropdown>
+                        <button type="button" class="nav-link inline-flex items-center gap-1 <?= $communityNavActive ? 'nav-link-active' : '' ?>" data-nav-trigger aria-expanded="false" aria-haspopup="true">
+                            Community
+                            <svg class="h-3.5 w-3.5 transition-transform" data-nav-caret fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div class="invisible absolute left-1/2 z-50 mt-3 w-52 -translate-x-1/2 translate-y-1 rounded-xl border border-gray-200 bg-white p-2 opacity-0 shadow-lg transition-all" data-nav-menu>
+                            <a href="<?= APP_URL ?>?url=alumni" class="block rounded-lg px-3 py-2 text-sm font-medium <?= $alumniNavActive ? 'bg-primary-50 text-primary-800' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-700' ?>">Old Students</a>
+                            <a href="<?= APP_URL ?>?url=events" class="block rounded-lg px-3 py-2 text-sm font-medium <?= $eventsNavActive ? 'bg-primary-50 text-primary-800' : 'text-gray-700 hover:bg-gray-50 hover:text-primary-700' ?>">Events</a>
+                        </div>
+                    </div>
                     <a href="<?= APP_URL ?>?url=videos" class="nav-link <?= in_array($_GET['url'] ?? '', ['videos', 'youtube'], true) ? 'nav-link-active' : '' ?>">Videos</a>
                     <a href="<?= APP_URL ?>?url=staff" class="nav-link <?= ($_GET['url'] ?? '') === 'staff' ? 'nav-link-active' : '' ?>">Staff</a>
                     <a href="<?= APP_URL ?>?url=contact" class="nav-link <?= ($_GET['url'] ?? '') === 'contact' ? 'nav-link-active' : '' ?>">Contact</a>
@@ -157,7 +170,12 @@
             <div class="px-4 pt-3 pb-4 space-y-1">
                 <a href="<?= APP_URL ?>" class="block px-3 py-2 rounded-lg text-base font-medium <?= empty($_GET['url']) || $_GET['url'] === 'home' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Home</a>
                 <a href="<?= APP_URL ?>?url=history" class="block px-3 py-2 rounded-lg text-base font-medium <?= ($_GET['url'] ?? '') === 'history' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">History</a>
-                <a href="<?= APP_URL ?>?url=programs" class="block px-3 py-2 rounded-lg text-base font-medium <?= $programsNavActive ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Programs</a>
+                <a href="<?= APP_URL ?>?url=departments" class="block px-3 py-2 rounded-lg text-base font-medium <?= $programsNavActive ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Departments</a>
+                <div class="rounded-lg <?= $communityNavActive ? 'bg-primary-50/40' : '' ?>">
+                    <p class="px-3 pt-2 text-[11px] font-semibold uppercase tracking-wider text-gray-500">Community</p>
+                    <a href="<?= APP_URL ?>?url=alumni" class="block px-3 py-2 rounded-lg text-base font-medium <?= $alumniNavActive ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Old Students</a>
+                    <a href="<?= APP_URL ?>?url=events" class="block px-3 py-2 rounded-lg text-base font-medium <?= $eventsNavActive ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Events</a>
+                </div>
                 <a href="<?= APP_URL ?>?url=videos" class="block px-3 py-2 rounded-lg text-base font-medium <?= in_array($_GET['url'] ?? '', ['videos', 'youtube'], true) ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Videos</a>
                 <a href="<?= APP_URL ?>?url=staff" class="block px-3 py-2 rounded-lg text-base font-medium <?= ($_GET['url'] ?? '') === 'staff' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Staff</a>
                 <a href="<?= APP_URL ?>?url=contact" class="block px-3 py-2 rounded-lg text-base font-medium <?= ($_GET['url'] ?? '') === 'contact' ? 'bg-primary-50 text-primary-700' : 'text-gray-700 hover:bg-gray-50' ?>">Contact</a>
@@ -194,7 +212,9 @@
                     <ul class="space-y-2 text-sm text-primary-200">
                         <li><a href="<?= APP_URL ?>" class="hover:text-white hover:underline transition-colors">Home</a></li>
                         <li><a href="<?= APP_URL ?>?url=history" class="hover:text-white hover:underline transition-colors">History</a></li>
-                        <li><a href="<?= APP_URL ?>?url=programs" class="hover:text-white hover:underline transition-colors">Programs</a></li>
+                        <li><a href="<?= APP_URL ?>?url=departments" class="hover:text-white hover:underline transition-colors">Departments</a></li>
+                        <li><a href="<?= APP_URL ?>?url=alumni" class="hover:text-white hover:underline transition-colors">Old Students</a></li>
+                        <li><a href="<?= APP_URL ?>?url=events" class="hover:text-white hover:underline transition-colors">Events</a></li>
                         <li><a href="<?= APP_URL ?>?url=videos" class="hover:text-white hover:underline transition-colors">Videos</a></li>
                     </ul>
                 </div>
@@ -250,6 +270,68 @@
             iconOpen.classList.toggle('hidden', !isHidden);
             iconClose.classList.toggle('hidden', isHidden);
             btn.setAttribute('aria-expanded', String(isHidden));
+        });
+    })();
+
+    (function () {
+        var groups = document.querySelectorAll('[data-nav-dropdown]');
+        if (!groups.length) return;
+        var open = null;
+
+        function setOpen(group, isOpen) {
+            var menu = group.querySelector('[data-nav-menu]');
+            var caret = group.querySelector('[data-nav-caret]');
+            var trigger = group.querySelector('[data-nav-trigger]');
+            if (!menu || !trigger) return;
+            if (isOpen) {
+                menu.classList.remove('invisible', 'opacity-0', 'translate-y-1');
+                menu.classList.add('visible', 'opacity-100', 'translate-y-0');
+                trigger.setAttribute('aria-expanded', 'true');
+                if (caret) caret.classList.add('rotate-180');
+            } else {
+                menu.classList.add('invisible', 'opacity-0', 'translate-y-1');
+                menu.classList.remove('visible', 'opacity-100', 'translate-y-0');
+                trigger.setAttribute('aria-expanded', 'false');
+                if (caret) caret.classList.remove('rotate-180');
+            }
+        }
+
+        groups.forEach(function (group) {
+            var trigger = group.querySelector('[data-nav-trigger]');
+            if (!trigger) return;
+            trigger.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (open && open !== group) setOpen(open, false);
+                var isOpen = trigger.getAttribute('aria-expanded') === 'true';
+                setOpen(group, !isOpen);
+                open = !isOpen ? group : null;
+            });
+            group.addEventListener('mouseenter', function () {
+                if (window.matchMedia('(min-width: 768px)').matches) {
+                    if (open && open !== group) setOpen(open, false);
+                    setOpen(group, true);
+                    open = group;
+                }
+            });
+            group.addEventListener('mouseleave', function () {
+                if (window.matchMedia('(min-width: 768px)').matches) {
+                    setOpen(group, false);
+                    if (open === group) open = null;
+                }
+            });
+        });
+
+        document.addEventListener('click', function () {
+            if (open) {
+                setOpen(open, false);
+                open = null;
+            }
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && open) {
+                setOpen(open, false);
+                open = null;
+            }
         });
     })();
 </script>

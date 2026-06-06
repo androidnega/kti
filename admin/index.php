@@ -95,6 +95,40 @@ switch ($action) {
         $controller->programMediaCaptionSave();
         break;
 
+    // Alumni / Old Students
+    case 'alumni':
+        $controller->alumni();
+        break;
+    case 'alumni_create':
+        $controller->alumniForm();
+        break;
+    case 'alumni_edit':
+        $controller->alumniForm($id);
+        break;
+    case 'alumni_save':
+        $controller->alumniSave();
+        break;
+    case 'alumni_delete':
+        $controller->alumniDelete($id);
+        break;
+
+    // Events
+    case 'events':
+        $controller->events();
+        break;
+    case 'event_create':
+        $controller->eventForm();
+        break;
+    case 'event_edit':
+        $controller->eventForm($id);
+        break;
+    case 'event_save':
+        $controller->eventSave();
+        break;
+    case 'event_delete':
+        $controller->eventDelete($id);
+        break;
+
     // Logout
     case 'logout':
         Auth::logout();

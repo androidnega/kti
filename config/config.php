@@ -35,6 +35,10 @@ define('UPLOAD_PATH', STORAGE_PATH . '/uploads');
 /** Web-accessible program images/videos (under public/) */
 define('PROGRAM_UPLOAD_PATH', PUBLIC_PATH . '/uploads/programs');
 define('PROGRAM_VIDEO_PATH', PUBLIC_PATH . '/uploads/videos');
+/** Web-accessible alumni profile images (under public/) */
+define('ALUMNI_UPLOAD_PATH', PUBLIC_PATH . '/uploads/alumni');
+/** Web-accessible event cover images (under public/) */
+define('EVENT_UPLOAD_PATH', PUBLIC_PATH . '/uploads/events');
 /** Max JPEG output size for program gallery images (bytes; strict “under 250 KB” as 250×1000) */
 define('PROGRAM_IMAGE_MAX_BYTES', 250000);
 

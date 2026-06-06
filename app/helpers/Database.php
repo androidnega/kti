@@ -22,6 +22,7 @@ class Database {
             // Initialize database if it doesn't exist
             $this->initializeDatabase();
             $this->migrateProgramsSchema();
+            $this->migrateCommunitySchema();
         } catch (PDOException $e) {
             die('Database connection failed: ' . $e->getMessage());
         }
@@ -87,6 +88,56 @@ class Database {
         );
         $this->connection->exec(
             'CREATE INDEX IF NOT EXISTS idx_program_media_program ON program_media(program_id)'
+        );
+    }
+
+    /**
+     * Tables for alumni profiles and events; safe to call on every boot.
+     */
+    private function migrateCommunitySchema() {
+        $this->connection->exec(
+            'CREATE TABLE IF NOT EXISTS alumni (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                program TEXT,
+                graduation_year TEXT,
+                current_role TEXT,
+                location TEXT,
+                quote TEXT,
+                bio TEXT,
+                photo_path TEXT,
+                sort_order INTEGER NOT NULL DEFAULT 0,
+                is_featured INTEGER NOT NULL DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )'
+        );
+        $this->connection->exec(
+            'CREATE INDEX IF NOT EXISTS idx_alumni_sort ON alumni(sort_order, id)'
+        );
+
+        $this->connection->exec(
+            'CREATE TABLE IF NOT EXISTS events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                slug TEXT UNIQUE,
+                summary TEXT,
+                content TEXT,
+                event_date DATETIME,
+                end_date DATETIME,
+                location TEXT,
+                cover_image TEXT,
+                is_published INTEGER NOT NULL DEFAULT 1,
+                sort_order INTEGER NOT NULL DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )'
+        );
+        $this->connection->exec(
+            'CREATE INDEX IF NOT EXISTS idx_events_date ON events(event_date)'
+        );
+        $this->connection->exec(
+            'CREATE INDEX IF NOT EXISTS idx_events_published ON events(is_published)'
         );
     }
 
