@@ -129,20 +129,6 @@
     </div>
 </section>
 
-<!-- CTA Section -->
-<section class="py-16 bg-primary-800 text-white relative overflow-hidden">
-    <div class="absolute inset-0 opacity-10">
-        <img src="<?= APP_URL ?>/assets/images/girls domitory.jpg" alt="" class="w-full h-full object-cover">
-    </div>
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-        <h2 class="text-4xl font-bold mb-4">Join Our Team</h2>
-        <p class="text-xl text-primary-100 mb-8">We're always looking for passionate educators and professionals</p>
-        <a href="<?= APP_URL ?>?url=contact" class="btn bg-accent-400 text-primary-900 hover:bg-accent-500 px-8 py-3 text-lg font-bold">
-            Get In Touch
-        </a>
-    </div>
-</section>
-
 <?php
 $content = ob_get_clean();
 $title = 'Staff - ' . APP_NAME;
