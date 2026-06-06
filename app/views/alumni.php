@@ -209,14 +209,6 @@ if (is_dir($memoriesDir)) {
 </script>
 <?php endif; ?>
 
-<section class="bg-primary-900 py-14 text-white">
-    <div class="mx-auto max-w-3xl px-4 text-center sm:px-6">
-        <h2 class="text-2xl font-bold sm:text-3xl">Are you a Kikam old student?</h2>
-        <p class="mx-auto mt-3 max-w-xl text-primary-100">Tell us where you are today. Your story can inspire the next generation of trainees.</p>
-        <a href="<?= APP_URL ?>?url=contact" class="btn btn-accent mt-6 inline-flex px-8 py-3">Get in touch</a>
-    </div>
-</section>
-
 <?php
 $content = ob_get_clean();
 $title = 'Old Students - ' . APP_NAME;
