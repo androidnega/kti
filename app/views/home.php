@@ -57,16 +57,78 @@
             </div>
             <div class="relative w-full">
                 <div class="absolute inset-0 bg-primary-600 rounded-2xl transform rotate-3 scale-105 opacity-10 pointer-events-none hidden md:block"></div>
-                <div class="relative rounded-2xl shadow-xl overflow-hidden aspect-video bg-black">
-                    <iframe
-                        src="https://www.youtube.com/embed/_fgBVzVGSFU?autoplay=1&amp;mute=0&amp;controls=0&amp;modestbranding=1&amp;rel=0&amp;playsinline=1"
-                        title="Kikam Technical Institute"
-                        class="absolute inset-0 w-full h-full border-0"
+                <div
+                    id="home-video"
+                    class="group relative aspect-video cursor-pointer overflow-hidden rounded-2xl bg-black shadow-xl"
+                    data-video-id="_fgBVzVGSFU"
+                    data-video-title="Kikam Technical Institute"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Play video about Kikam Technical Institute"
+                >
+                    <img
+                        src="https://i.ytimg.com/vi/_fgBVzVGSFU/hqdefault.jpg"
+                        alt=""
+                        class="absolute inset-0 h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-90"
                         loading="lazy"
-                        allow="autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowfullscreen
-                    ></iframe>
+                        decoding="async"
+                    >
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="flex h-16 w-16 items-center justify-center rounded-full bg-white/95 text-primary-900 shadow-lg ring-1 ring-black/10 transition-transform duration-200 group-hover:scale-105 sm:h-20 sm:w-20" aria-hidden="true">
+                            <svg class="ml-1 h-7 w-7 sm:h-8 sm:w-8" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        </span>
+                    </div>
                 </div>
+                <script>
+                (function () {
+                    var wrap = document.getElementById('home-video');
+                    if (!wrap) return;
+                    var loaded = false;
+
+                    function load(autoplay) {
+                        if (loaded) return;
+                        loaded = true;
+                        var id = wrap.getAttribute('data-video-id');
+                        var title = wrap.getAttribute('data-video-title') || 'Video';
+                        var params = ['rel=0', 'modestbranding=1', 'playsinline=1'];
+                        if (autoplay) {
+                            params.push('autoplay=1');
+                            params.push('mute=1');
+                        }
+                        var src = 'https://www.youtube.com/embed/' + encodeURIComponent(id) + '?' + params.join('&');
+                        var iframe = document.createElement('iframe');
+                        iframe.setAttribute('src', src);
+                        iframe.setAttribute('title', title);
+                        iframe.setAttribute('class', 'absolute inset-0 h-full w-full border-0');
+                        iframe.setAttribute('allow', 'autoplay; accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+                        iframe.setAttribute('allowfullscreen', '');
+                        wrap.innerHTML = '';
+                        wrap.style.cursor = 'default';
+                        wrap.appendChild(iframe);
+                    }
+
+                    wrap.addEventListener('click', function () { load(true); });
+                    wrap.addEventListener('keydown', function (e) {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            load(true);
+                        }
+                    });
+
+                    if ('IntersectionObserver' in window) {
+                        var io = new IntersectionObserver(function (entries) {
+                            entries.forEach(function (entry) {
+                                if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                                    load(true);
+                                    io.disconnect();
+                                }
+                            });
+                        }, { threshold: [0.5] });
+                        io.observe(wrap);
+                    }
+                })();
+                </script>
             </div>
         </div>
     </div>
