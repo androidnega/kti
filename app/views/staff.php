@@ -38,10 +38,10 @@
                     'focus' => '50% 50%',
                 ],
                 [
-                    'name' => 'Vice Principal, Academics',
-                    'role' => 'Academics',
+                    'name' => 'Mr. David K. Jekpo',
+                    'role' => 'Vice Principal, Academics',
                     'image' => 'assets/images/vp-academics.jpg',
-                    'alt' => 'Portrait of the Vice Principal, Academics',
+                    'alt' => 'Portrait of Mr. David K. Jekpo, Vice Principal, Academics',
                     'focus' => '50% 22%',
                 ],
                 [
