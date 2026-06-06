@@ -1,36 +1,42 @@
 <?php ob_start(); ?>
 
 <!-- Hero Section -->
-<section class="bg-primary-900 text-white">
-    <div class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-16 sm:px-6 sm:py-20 md:gap-12 md:py-24 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-28">
-        <div class="order-2 lg:order-1">
-            <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-300 sm:text-xs">
-                <span class="h-1.5 w-1.5 rounded-full bg-accent-400"></span>
+<section class="relative overflow-hidden bg-accent-50 text-primary-900">
+    <div class="pointer-events-none absolute -top-32 -left-24 h-72 w-72 rounded-full bg-accent-200/50 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-32 -right-24 h-80 w-80 rounded-full bg-primary-200/40 blur-3xl"></div>
+
+    <div class="relative mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 py-14 sm:px-6 sm:py-16 md:gap-12 md:py-20 lg:grid-cols-12 lg:gap-12 lg:px-8 lg:py-24">
+        <div class="order-1 lg:col-span-5">
+            <div class="relative mx-auto w-full max-w-sm sm:max-w-md lg:max-w-none">
+                <div class="absolute -inset-3 hidden rounded-3xl bg-gradient-to-br from-accent-300/40 to-primary-300/30 blur-xl lg:block" aria-hidden="true"></div>
+                <div class="relative aspect-[4/3] overflow-hidden rounded-2xl bg-white shadow-xl ring-1 ring-black/5">
+                    <img src="<?= APP_URL ?>/assets/images/hero-workshop.png" alt="Students learning lathe operations at Kikam Technical Institute workshop" class="h-full w-full object-cover" loading="eager" fetchpriority="high">
+                </div>
+            </div>
+        </div>
+
+        <div class="order-2 lg:col-span-7">
+            <span class="inline-flex items-center gap-2 rounded-full border border-primary-900/10 bg-white/70 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary-700 backdrop-blur sm:text-xs">
+                <span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>
                 Established 1963
             </span>
 
-            <h1 class="mt-6 text-balance text-3xl font-bold leading-[1.1] tracking-tight sm:text-4xl md:text-5xl lg:text-6xl">
-                Kikam Technical Institute
+            <h1 class="mt-6 text-balance text-3xl font-bold leading-[1.1] tracking-tight text-primary-900 sm:text-4xl md:text-5xl lg:text-6xl">
+                Train today. Skill tomorrow. <span class="text-accent-600">Succeed always.</span>
             </h1>
 
-            <p class="mt-5 max-w-xl text-base leading-relaxed text-primary-100 sm:text-lg">
+            <p class="mt-5 max-w-xl text-base leading-relaxed text-primary-700 sm:text-lg">
                 Hands-on technical and vocational training in the Western Region of Ghana — preparing students with the skills industry actually needs.
             </p>
 
             <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-                <a href="<?= APP_URL ?>?url=departments" class="inline-flex items-center justify-center rounded-full bg-accent-400 px-7 py-3 text-base font-semibold text-primary-900 shadow-sm transition hover:bg-accent-300 focus:outline-none focus:ring-2 focus:ring-accent-300 focus:ring-offset-2 focus:ring-offset-primary-900">
+                <a href="<?= APP_URL ?>?url=departments" class="inline-flex items-center justify-center rounded-full bg-primary-900 px-7 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-black focus:outline-none focus:ring-2 focus:ring-primary-700 focus:ring-offset-2 focus:ring-offset-accent-50">
                     Explore departments
                     <svg class="ml-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </a>
-                <a href="<?= APP_URL ?>?url=contact" class="inline-flex items-center justify-center rounded-full border border-white/25 px-7 py-3 text-base font-semibold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white/40 focus:ring-offset-2 focus:ring-offset-primary-900">
+                <a href="<?= APP_URL ?>?url=contact" class="inline-flex items-center justify-center rounded-full border border-primary-900/20 bg-white/70 px-7 py-3 text-base font-semibold text-primary-900 backdrop-blur transition hover:border-primary-900/40 hover:bg-white focus:outline-none focus:ring-2 focus:ring-primary-700 focus:ring-offset-2 focus:ring-offset-accent-50">
                     Contact us
                 </a>
-            </div>
-        </div>
-
-        <div class="order-1 lg:order-2">
-            <div class="relative mx-auto aspect-[4/3] w-full max-w-xl overflow-hidden rounded-2xl bg-primary-800 shadow-2xl ring-1 ring-white/10 sm:aspect-[5/4] lg:aspect-[4/3]">
-                <img src="<?= APP_URL ?>/assets/images/droneshotcampus.jpg" alt="Aerial view of Kikam Technical Institute campus" class="h-full w-full object-cover" loading="eager" fetchpriority="high">
             </div>
         </div>
     </div>
