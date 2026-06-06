@@ -29,9 +29,9 @@ if (is_dir($memoriesDir)) {
     </div>
 </section>
 
+<?php if ($count > 0): ?>
 <section class="border-b border-slate-200 bg-gray-50 py-12 sm:py-14">
     <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <?php if ($count > 0): ?>
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <?php foreach ($alumni as $a):
                     $photo = !empty($a['photo_path']) ? rtrim(APP_URL, '/') . '/' . ltrim($a['photo_path'], '/') : '';
@@ -87,17 +87,9 @@ if (is_dir($memoriesDir)) {
                 </article>
                 <?php endforeach; ?>
             </div>
-        <?php else: ?>
-            <div class="mx-auto max-w-2xl rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center shadow-sm">
-                <h2 class="text-2xl font-bold text-primary-900">We're collecting alumni stories</h2>
-                <p class="mt-3 text-sm leading-relaxed text-slate-600">
-                    Are you a former student of Kikam Technical Institute? We’d love to feature your story here — your name, year, what you do today, and a photo if you can share one.
-                </p>
-                <a href="<?= APP_URL ?>?url=contact" class="btn btn-accent mt-6 inline-flex px-6 py-3">Reach out to share your story</a>
-            </div>
-        <?php endif; ?>
     </div>
 </section>
+<?php endif; ?>
 
 <?php if (!empty($alumniMemories)): ?>
 <section class="bg-white py-14 sm:py-16">
