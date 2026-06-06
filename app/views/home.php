@@ -278,8 +278,10 @@ $slideCount = count($heroSlides);
 </section>
 
 <!-- Kikam at a glance -->
-<section class="bg-gradient-to-br from-slate-50 via-white to-primary-50 py-16 sm:py-20">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+<section class="relative overflow-hidden bg-accent-50 py-16 sm:py-20">
+    <div class="pointer-events-none absolute -top-32 -left-24 h-72 w-72 rounded-full bg-accent-200/50 blur-3xl" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute -bottom-32 -right-24 h-80 w-80 rounded-full bg-primary-200/40 blur-3xl" aria-hidden="true"></div>
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-2xl text-center">
             <span class="inline-flex items-center gap-2 rounded-full bg-accent-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-700 sm:text-xs">
                 <span class="h-1.5 w-1.5 rounded-full bg-accent-500"></span>
